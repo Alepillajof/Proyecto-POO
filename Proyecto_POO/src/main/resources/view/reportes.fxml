@@ -1,14 +1,94 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import java.util.*?>
-<?import javafx.scene.*?>
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane xmlns="http://javafx.com/javafx"
-            xmlns:fx="http://javafx.com/fxml"
-            fx:controller="CONTROLLER_NAME"
-            prefHeight="400.0" prefWidth="600.0">
+<BorderPane xmlns="http://javafx.com/javafx/21"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.proyecto.proyecto_poo.controller.ReporteController">
 
-</AnchorPane>
+    <top>
+        <Label text="GESTIÓN DE REPORTES"
+               style="-fx-font-size:20px; -fx-font-weight:bold;"
+               BorderPane.alignment="CENTER"/>
+    </top>
+
+    <center>
+
+        <VBox spacing="15" padding="20">
+
+            <GridPane hgap="10" vgap="10">
+
+                <Label text="Título:" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+                <TextField fx:id="txtTitulo"
+                           promptText="Ingrese el título"
+                           GridPane.rowIndex="0"
+                           GridPane.columnIndex="1"/>
+
+                <Label text="Descripción:" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+                <TextArea fx:id="txtDescripcion"
+                          prefRowCount="3"
+                          promptText="Ingrese la descripción"
+                          GridPane.rowIndex="1"
+                          GridPane.columnIndex="1"/>
+
+                <Label text="Fecha:" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+                <DatePicker fx:id="dpFecha"
+                            GridPane.rowIndex="2"
+                            GridPane.columnIndex="1"/>
+
+                <Label text="Usuario ID:" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
+                <TextField fx:id="txtUsuarioId"
+                           promptText="Ingrese el ID del usuario"
+                           GridPane.rowIndex="3"
+                           GridPane.columnIndex="1"/>
+
+            </GridPane>
+
+            <HBox spacing="15">
+
+                <Button text="Guardar"
+                        onAction="#guardar"/>
+
+                <Button text="Actualizar"
+                        onAction="#actualizar"/>
+
+                <Button text="Eliminar"
+                        onAction="#eliminar"/>
+
+            </HBox>
+
+            <TableView fx:id="tablaReportes" prefHeight="350">
+
+                <columns>
+
+                    <TableColumn fx:id="colId"
+                                 text="ID"
+                                 prefWidth="60"/>
+
+                    <TableColumn fx:id="colTitulo"
+                                 text="Título"
+                                 prefWidth="180"/>
+
+                    <TableColumn fx:id="colDescripcion"
+                                 text="Descripción"
+                                 prefWidth="280"/>
+
+                    <TableColumn fx:id="colFecha"
+                                 text="Fecha"
+                                 prefWidth="120"/>
+
+                    <TableColumn fx:id="colUsuarioId"
+                                 text="Usuario ID"
+                                 prefWidth="100"/>
+
+                </columns>
+
+            </TableView>
+
+        </VBox>
+
+    </center>
+
+</BorderPane>

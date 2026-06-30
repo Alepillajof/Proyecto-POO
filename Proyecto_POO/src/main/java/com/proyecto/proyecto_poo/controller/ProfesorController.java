@@ -30,19 +30,19 @@ public class ProfesorController {
     private TableView<Profesor> tablaProfesores;
 
     @FXML
-    private TableColumn<Profesor,Integer> colId;
+    private TableColumn<Profesor, Integer> colId;
 
     @FXML
-    private TableColumn<Profesor,String> colNombre;
+    private TableColumn<Profesor, String> colNombre;
 
     @FXML
-    private TableColumn<Profesor,String> colApellido;
+    private TableColumn<Profesor, String> colApellido;
 
     @FXML
-    private TableColumn<Profesor,String> colCedula;
+    private TableColumn<Profesor, String> colCedula;
 
     @FXML
-    private TableColumn<Profesor,String> colEspecialidad;
+    private TableColumn<Profesor, String> colEspecialidad;
 
     private final ProfesorDAO dao = new ProfesorDAO();
 
@@ -50,7 +50,7 @@ public class ProfesorController {
             FXCollections.observableArrayList();
 
     @FXML
-    public void initialize(){
+    public void initialize() {
 
         colId.setCellValueFactory(new PropertyValueFactory<>("id"));
         colNombre.setCellValueFactory(new PropertyValueFactory<>("nombre"));
@@ -63,7 +63,7 @@ public class ProfesorController {
         tablaProfesores.getSelectionModel().selectedItemProperty().addListener(
                 (observable, anterior, profesor) -> {
 
-                    if(profesor != null){
+                    if (profesor != null) {
 
                         txtNombre.setText(profesor.getNombre());
                         txtApellido.setText(profesor.getApellido());
@@ -77,31 +77,32 @@ public class ProfesorController {
 
     }
 
-    private void cargarTabla(){
+    private void cargarTabla() {
 
         lista.clear();
-
         lista.addAll(dao.listar());
-
         tablaProfesores.setItems(lista);
 
     }
 
     @FXML
-    private void guardar(){
+    private void guardar() {
+
+        if (!validarCampos()) {
+            return;
+        }
 
         Profesor profesor = new Profesor();
 
-        profesor.setNombre(txtNombre.getText());
-        profesor.setApellido(txtApellido.getText());
-        profesor.setCedula(txtCedula.getText());
-        profesor.setEspecialidad(txtEspecialidad.getText());
-        profesor.setCorreo(txtCorreo.getText());
+        profesor.setNombre(txtNombre.getText().trim());
+        profesor.setApellido(txtApellido.getText().trim());
+        profesor.setCedula(txtCedula.getText().trim());
+        profesor.setEspecialidad(txtEspecialidad.getText().trim());
+        profesor.setCorreo(txtCorreo.getText().trim());
 
-        if(dao.guardar(profesor)){
+        if (dao.guardar(profesor)) {
 
             limpiar();
-
             cargarTabla();
 
         }
@@ -109,37 +110,42 @@ public class ProfesorController {
     }
 
     @FXML
-    private void actualizar(){
+    private void actualizar() {
 
         Profesor profesor = tablaProfesores.getSelectionModel().getSelectedItem();
 
-        if(profesor == null){
+        if (profesor == null) {
 
+            mostrarAlerta("Aviso", "Seleccione un profesor para actualizar.");
             return;
 
         }
 
-        profesor.setNombre(txtNombre.getText());
-        profesor.setApellido(txtApellido.getText());
-        profesor.setCedula(txtCedula.getText());
-        profesor.setEspecialidad(txtEspecialidad.getText());
-        profesor.setCorreo(txtCorreo.getText());
+        if (!validarCampos()) {
+            return;
+        }
+
+        profesor.setNombre(txtNombre.getText().trim());
+        profesor.setApellido(txtApellido.getText().trim());
+        profesor.setCedula(txtCedula.getText().trim());
+        profesor.setEspecialidad(txtEspecialidad.getText().trim());
+        profesor.setCorreo(txtCorreo.getText().trim());
 
         dao.actualizar(profesor);
 
         limpiar();
-
         cargarTabla();
 
     }
 
     @FXML
-    private void eliminar(){
+    private void eliminar() {
 
         Profesor profesor = tablaProfesores.getSelectionModel().getSelectedItem();
 
-        if(profesor == null){
+        if (profesor == null) {
 
+            mostrarAlerta("Aviso", "Seleccione un profesor para eliminar.");
             return;
 
         }
@@ -147,12 +153,46 @@ public class ProfesorController {
         dao.eliminar(profesor.getId());
 
         limpiar();
-
         cargarTabla();
 
     }
 
-    private void limpiar(){
+    private boolean validarCampos() {
+
+        if (txtNombre.getText().trim().isEmpty()) {
+            mostrarAlerta("Campo vacío", "Ingrese el nombre.");
+            txtNombre.requestFocus();
+            return false;
+        }
+
+        if (txtApellido.getText().trim().isEmpty()) {
+            mostrarAlerta("Campo vacío", "Ingrese el apellido.");
+            txtApellido.requestFocus();
+            return false;
+        }
+
+        if (txtCedula.getText().trim().isEmpty()) {
+            mostrarAlerta("Campo vacío", "Ingrese la cédula.");
+            txtCedula.requestFocus();
+            return false;
+        }
+
+        if (txtEspecialidad.getText().trim().isEmpty()) {
+            mostrarAlerta("Campo vacío", "Ingrese la especialidad.");
+            txtEspecialidad.requestFocus();
+            return false;
+        }
+
+        if (txtCorreo.getText().trim().isEmpty()) {
+            mostrarAlerta("Campo vacío", "Ingrese el correo.");
+            txtCorreo.requestFocus();
+            return false;
+        }
+
+        return true;
+    }
+
+    private void limpiar() {
 
         txtNombre.clear();
         txtApellido.clear();
@@ -161,6 +201,16 @@ public class ProfesorController {
         txtCorreo.clear();
 
         tablaProfesores.getSelectionModel().clearSelection();
+
+    }
+
+    private void mostrarAlerta(String titulo, String mensaje) {
+
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle(titulo);
+        alert.setHeaderText(null);
+        alert.setContentText(mensaje);
+        alert.showAndWait();
 
     }
 

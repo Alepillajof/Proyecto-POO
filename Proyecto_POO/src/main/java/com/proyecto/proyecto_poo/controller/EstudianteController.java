@@ -96,16 +96,20 @@ public class EstudianteController {
     @FXML
     private void guardar() {
 
+        if (!validarCampos()) {
+            return;
+        }
+
         try {
 
             Estudiante estudiante = new Estudiante();
 
-            estudiante.setNombre(txtNombre.getText());
-            estudiante.setApellido(txtApellido.getText());
-            estudiante.setCedula(txtCedula.getText());
-            estudiante.setCarrera(txtCarrera.getText());
-            estudiante.setNivel(Integer.parseInt(txtNivel.getText()));
-            estudiante.setCorreo(txtCorreo.getText());
+            estudiante.setNombre(txtNombre.getText().trim());
+            estudiante.setApellido(txtApellido.getText().trim());
+            estudiante.setCedula(txtCedula.getText().trim());
+            estudiante.setCarrera(txtCarrera.getText().trim());
+            estudiante.setNivel(Integer.parseInt(txtNivel.getText().trim()));
+            estudiante.setCorreo(txtCorreo.getText().trim());
 
             if (dao.guardar(estudiante)) {
                 limpiar();
@@ -113,7 +117,7 @@ public class EstudianteController {
             }
 
         } catch (NumberFormatException e) {
-            mostrarAlerta("Error", "El nivel debe ser un número entero");
+            mostrarAlerta("Error", "El nivel debe ser un número entero.");
         }
     }
 
@@ -123,17 +127,22 @@ public class EstudianteController {
         Estudiante estudiante = tablaEstudiantes.getSelectionModel().getSelectedItem();
 
         if (estudiante == null) {
+            mostrarAlerta("Aviso", "Seleccione un estudiante para actualizar.");
+            return;
+        }
+
+        if (!validarCampos()) {
             return;
         }
 
         try {
 
-            estudiante.setNombre(txtNombre.getText());
-            estudiante.setApellido(txtApellido.getText());
-            estudiante.setCedula(txtCedula.getText());
-            estudiante.setCarrera(txtCarrera.getText());
-            estudiante.setNivel(Integer.parseInt(txtNivel.getText()));
-            estudiante.setCorreo(txtCorreo.getText());
+            estudiante.setNombre(txtNombre.getText().trim());
+            estudiante.setApellido(txtApellido.getText().trim());
+            estudiante.setCedula(txtCedula.getText().trim());
+            estudiante.setCarrera(txtCarrera.getText().trim());
+            estudiante.setNivel(Integer.parseInt(txtNivel.getText().trim()));
+            estudiante.setCorreo(txtCorreo.getText().trim());
 
             dao.actualizar(estudiante);
 
@@ -141,7 +150,7 @@ public class EstudianteController {
             cargarTabla();
 
         } catch (NumberFormatException e) {
-            mostrarAlerta("Error", "El nivel debe ser un número entero");
+            mostrarAlerta("Error", "El nivel debe ser un número entero.");
         }
     }
 
@@ -151,6 +160,7 @@ public class EstudianteController {
         Estudiante estudiante = tablaEstudiantes.getSelectionModel().getSelectedItem();
 
         if (estudiante == null) {
+            mostrarAlerta("Aviso", "Seleccione un estudiante para eliminar.");
             return;
         }
 
@@ -158,6 +168,50 @@ public class EstudianteController {
 
         limpiar();
         cargarTabla();
+    }
+
+    /**
+     * Valida que todos los campos estén llenos.
+     */
+    private boolean validarCampos() {
+
+        if (txtNombre.getText().trim().isEmpty()) {
+            mostrarAlerta("Campo vacío", "Ingrese el nombre.");
+            txtNombre.requestFocus();
+            return false;
+        }
+
+        if (txtApellido.getText().trim().isEmpty()) {
+            mostrarAlerta("Campo vacío", "Ingrese el apellido.");
+            txtApellido.requestFocus();
+            return false;
+        }
+
+        if (txtCedula.getText().trim().isEmpty()) {
+            mostrarAlerta("Campo vacío", "Ingrese la cédula.");
+            txtCedula.requestFocus();
+            return false;
+        }
+
+        if (txtCarrera.getText().trim().isEmpty()) {
+            mostrarAlerta("Campo vacío", "Ingrese la carrera.");
+            txtCarrera.requestFocus();
+            return false;
+        }
+
+        if (txtNivel.getText().trim().isEmpty()) {
+            mostrarAlerta("Campo vacío", "Ingrese el nivel.");
+            txtNivel.requestFocus();
+            return false;
+        }
+
+        if (txtCorreo.getText().trim().isEmpty()) {
+            mostrarAlerta("Campo vacío", "Ingrese el correo.");
+            txtCorreo.requestFocus();
+            return false;
+        }
+
+        return true;
     }
 
     private void limpiar() {
