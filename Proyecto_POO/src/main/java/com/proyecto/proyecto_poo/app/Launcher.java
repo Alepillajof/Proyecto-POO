@@ -1,9 +1,11 @@
-package com.proyecto.proyecto_poo;
-
-import javafx.application.Application;
+package com.proyecto.proyecto_poo.app;
 
 public class Launcher {
+
     public static void main(String[] args) {
-        Application.launch(Main.class, args);
+
+        MainApp.main(args);
+
     }
+
 }
