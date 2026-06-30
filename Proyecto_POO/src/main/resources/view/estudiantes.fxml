@@ -1,14 +1,116 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import java.util.*?>
-<?import javafx.scene.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane xmlns="http://javafx.com/javafx"
-            xmlns:fx="http://javafx.com/fxml"
-            fx:controller="CONTROLLER_NAME"
-            prefHeight="400.0" prefWidth="600.0">
+<AnchorPane xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.proyecto.proyecto_poo.controller.EstudianteController"
+            prefWidth="780"
+            prefHeight="520">
+
+    <children>
+
+        <Label layoutX="25"
+               layoutY="20"
+               text="Gestión de Estudiantes"
+               style="-fx-font-size:22px;-fx-font-weight:bold;"/>
+
+        <Label layoutX="25" layoutY="70" text="Nombre"/>
+
+        <TextField fx:id="txtNombre"
+                   layoutX="120"
+                   layoutY="65"
+                   prefWidth="220"/>
+
+        <Label layoutX="25" layoutY="110" text="Apellido"/>
+
+        <TextField fx:id="txtApellido"
+                   layoutX="120"
+                   layoutY="105"
+                   prefWidth="220"/>
+
+        <Label layoutX="25" layoutY="150" text="Cédula"/>
+
+        <TextField fx:id="txtCedula"
+                   layoutX="120"
+                   layoutY="145"
+                   prefWidth="220"/>
+
+        <Label layoutX="25" layoutY="190" text="Carrera"/>
+
+        <TextField fx:id="txtCarrera"
+                   layoutX="120"
+                   layoutY="185"
+                   prefWidth="220"/>
+
+        <Label layoutX="25" layoutY="230" text="Nivel"/>
+
+        <TextField fx:id="txtNivel"
+                   layoutX="120"
+                   layoutY="225"
+                   prefWidth="220"/>
+
+        <Label layoutX="25" layoutY="270" text="Correo"/>
+
+        <TextField fx:id="txtCorreo"
+                   layoutX="120"
+                   layoutY="265"
+                   prefWidth="220"/>
+
+        <Button text="Guardar"
+                layoutX="25"
+                layoutY="320"
+                prefWidth="95"
+                onAction="#guardar"/>
+
+        <Button text="Actualizar"
+                layoutX="135"
+                layoutY="320"
+                prefWidth="95"
+                onAction="#actualizar"/>
+
+        <Button text="Eliminar"
+                layoutX="245"
+                layoutY="320"
+                prefWidth="95"
+                onAction="#eliminar"/>
+
+        <TableView fx:id="tablaEstudiantes"
+                   layoutX="370"
+                   layoutY="65"
+                   prefWidth="390"
+                   prefHeight="390">
+
+            <columns>
+
+                <TableColumn fx:id="colId"
+                             text="ID"
+                             prefWidth="45"/>
+
+                <TableColumn fx:id="colNombre"
+                             text="Nombre"
+                             prefWidth="75"/>
+
+                <TableColumn fx:id="colApellido"
+                             text="Apellido"
+                             prefWidth="75"/>
+
+                <TableColumn fx:id="colCedula"
+                             text="Cédula"
+                             prefWidth="80"/>
+
+                <TableColumn fx:id="colCarrera"
+                             text="Carrera"
+                             prefWidth="80"/>
+
+                <TableColumn fx:id="colNivel"
+                             text="Nivel"
+                             prefWidth="60"/>
+
+            </columns>
+
+        </TableView>
+
+    </children>
 
 </AnchorPane>

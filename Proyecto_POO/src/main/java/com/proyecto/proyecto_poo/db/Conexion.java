@@ -11,7 +11,7 @@ public class Conexion {
 
     // Cambiar según la computadora
     private static final String USER = "root";
-    private static final String PASSWORD = "161604";
+    private static final String PASSWORD = "root123";
 
     public static Connection getConexion() {
 
