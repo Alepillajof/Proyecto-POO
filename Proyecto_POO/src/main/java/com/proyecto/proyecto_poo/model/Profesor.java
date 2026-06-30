@@ -2,6 +2,7 @@ package com.proyecto.proyecto_poo.model;
 
 public class Profesor extends Usuario {
 
+    private String cedula;
     private String especialidad;
 
     public Profesor() {
@@ -14,13 +15,21 @@ public class Profesor extends Usuario {
                     String usuario,
                     String contrasena,
                     String rol,
+                    String cedula,
                     String especialidad) {
 
-        super(id, nombre, apellido, correo,
-                usuario, contrasena, rol);
+        super(id, nombre, apellido, correo, usuario, contrasena, rol);
 
+        this.cedula = cedula;
         this.especialidad = especialidad;
+    }
 
+    public String getCedula() {
+        return cedula;
+    }
+
+    public void setCedula(String cedula) {
+        this.cedula = cedula;
     }
 
     public String getEspecialidad() {
@@ -35,10 +44,9 @@ public class Profesor extends Usuario {
     public String mostrarInformacion() {
 
         return "Profesor: "
-                + getNombre()
-                + " "
+                + getNombre() + " "
                 + getApellido()
-                + " - "
+                + " | Especialidad: "
                 + especialidad;
 
     }
