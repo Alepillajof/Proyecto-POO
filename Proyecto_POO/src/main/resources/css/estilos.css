@@ -1,0 +1,37 @@
+/* Estilo para los botones del menú lateral */
+.boton-menu {
+    -fx-background-color: transparent;
+    -fx-text-fill: #c0c6d9;
+    -fx-font-size: 14px;
+    -fx-alignment: BASELINE_LEFT;
+    -fx-padding: 0 0 0 20;
+    -fx-cursor: hand;
+    -fx-background-radius: 8;
+    -fx-transition: all 0.3s ease;
+}
+
+/* Efecto cuando pasas el mouse por encima */
+.boton-menu:hover {
+    -fx-background-color: #1e1b4b;
+    -fx-text-fill: white;
+}
+
+/* Estilo para cuando el botón está seleccionado (el que activas en Java) */
+.boton-menu-activo {
+    -fx-background-color: #7c3aed;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+}
+
+/* Estilo especial para el botón de cerrar sesión */
+.boton-cerrar {
+    -fx-background-color: transparent;
+    -fx-text-fill: #ef4444;
+    -fx-alignment: BASELINE_LEFT;
+    -fx-padding: 0 0 0 20;
+    -fx-cursor: hand;
+}
+
+.boton-cerrar:hover {
+    -fx-background-color: #450a0a;
+}

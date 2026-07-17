@@ -16,35 +16,24 @@ import javafx.scene.Scene;
 
 public class DashboardController {
 
-    @FXML
-    private Label lblUsuario;
+    // ... (tus campos @FXML existentes) ...
+    @FXML private Label lblUsuario;
+    @FXML private Label lblRol;
+    @FXML private Button btnProfesores;
+    @FXML private Button btnEstudiantes;
+    @FXML private Button btnReportes;
+    @FXML private AnchorPane panelPrincipal;
 
-    @FXML
-    private Label lblRol;
-
-    @FXML
-    private Button btnProfesores;
-
-    @FXML
-    private Button btnEstudiantes;
-
-    @FXML
-    private Button btnReportes;
-
-    @FXML
-    private AnchorPane panelPrincipal;
+    // AÑADE ESTAS CONSTANTES PARA LOS ESTILOS
+    private final String ESTILO_ACTIVO = "-fx-background-color: #7c3aed; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8; -fx-alignment: BASELINE_LEFT; -fx-padding: 0 0 0 20;";
+    private final String ESTILO_INACTIVO = "-fx-background-color: transparent; -fx-text-fill: #c0c6d9; -fx-font-size: 14px; -fx-alignment: BASELINE_LEFT; -fx-padding: 0 0 0 20;";
 
     @FXML
     public void initialize() {
-
         Usuario usuario = Sesion.getUsuario();
-
         lblUsuario.setText("Bienvenido: " + usuario.getNombre());
-
         lblRol.setText("Rol: " + usuario.getRol());
-
         configurarPermisos(usuario.getRol());
-
     }
 
     private void configurarPermisos(String rol){
@@ -52,91 +41,72 @@ public class DashboardController {
         switch (rol){
 
             case "ADMIN":
-
+                // Si es admin, no hacemos nada (todo está habilitado)
                 break;
 
             case "PROFESOR":
-
                 btnProfesores.setDisable(true);
-
                 break;
 
             case "ESTUDIANTE":
-
                 btnProfesores.setDisable(true);
-
                 btnReportes.setDisable(true);
-
                 break;
-
         }
-
     }
 
+    // AÑADE ESTE MÉTODO AUXILIAR
+    private void activarBoton(Button botonActivo) {
+        // Limpiamos estilos y quitamos clase activo
+        btnProfesores.getStyleClass().remove("boton-menu-activo");
+        btnEstudiantes.getStyleClass().remove("boton-menu-activo");
+        btnReportes.getStyleClass().remove("boton-menu-activo");
+
+        // Aplicamos clase activo al nuevo
+        botonActivo.getStyleClass().add("boton-menu-activo");
+    }
+
+    // ACTUALIZA TUS MÉTODOS DE NAVEGACIÓN
     @FXML
     private void abrirProfesores(){
-
         cargarVista("/view/profesores.fxml");
-
+        activarBoton(btnProfesores);
     }
 
     @FXML
     private void abrirEstudiantes(){
-
         cargarVista("/view/estudiantes.fxml");
-
+        activarBoton(btnEstudiantes);
     }
 
     @FXML
     private void abrirReportes(){
-
         cargarVista("/view/reportes.fxml");
-
+        activarBoton(btnReportes);
     }
 
     private void cargarVista(String ruta){
-
         try{
-
-            Parent vista = FXMLLoader.load(
-                    MainApp.class.getResource(ruta)
-            );
-
+            Parent vista = FXMLLoader.load(MainApp.class.getResource(ruta));
             panelPrincipal.getChildren().clear();
-
             panelPrincipal.getChildren().add(vista);
-
         }catch(Exception e){
-
             e.printStackTrace();
-
         }
-
     }
 
     @FXML
-    private void cerrarSesion(ActionEvent e){
-
-        try{
-
-            FXMLLoader loader = new FXMLLoader(
-                    MainApp.class.getResource("/view/login.fxml")
-            );
-
+    public void cerrarSesion(ActionEvent event) {
+        try {
+            FXMLLoader loader = new FXMLLoader(MainApp.class.getResource("/view/login.fxml"));
             Scene scene = new Scene(loader.load());
-
             Stage stage = (Stage) lblUsuario.getScene().getWindow();
-
             stage.setScene(scene);
-
             stage.show();
-
-        }catch(Exception ex){
-
+        } catch (Exception ex) {
             ex.printStackTrace();
-
         }
-
     }
 
+    // ... (tu método cerrarSesion sigue igual) ...
 }

@@ -24,60 +24,33 @@ public class LoginController {
 
     @FXML
     private void iniciarSesion(ActionEvent event) {
-
         UsuarioDAO dao = new UsuarioDAO();
-
-        Usuario usuario = dao.iniciarSesion(
-                txtUsuario.getText(),
-                txtContrasena.getText()
-        );
+        Usuario usuario = dao.iniciarSesion(txtUsuario.getText(), txtContrasena.getText());
 
         if(usuario != null){
-
             Sesion.setUsuario(usuario);
-
             abrirDashboard();
-
-        }else{
-
+        } else {
             Alert alert = new Alert(Alert.AlertType.ERROR);
-
             alert.setTitle("Error");
-
             alert.setHeaderText(null);
-
             alert.setContentText("Usuario o contraseña incorrectos.");
-
             alert.showAndWait();
-
         }
-
     }
 
     private void abrirDashboard(){
-
-        try{
-
-            FXMLLoader loader = new FXMLLoader(
-                    MainApp.class.getResource("/view/dashboard.fxml")
-            );
-
+        try {
+            FXMLLoader loader = new FXMLLoader(MainApp.class.getResource("/view/dashboard.fxml"));
             Scene scene = new Scene(loader.load());
-
             Stage stage = (Stage) txtUsuario.getScene().getWindow();
-
             stage.setScene(scene);
-
             stage.setTitle("Dashboard");
-
             stage.show();
-
-        }catch(Exception e){
-
+        } catch(Exception e) {
+            // Esto imprimirá el error real en la consola de IntelliJ
+            System.err.println("Error al cargar el dashboard:");
             e.printStackTrace();
-
         }
-
     }
-
 }
