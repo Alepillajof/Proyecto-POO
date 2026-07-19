@@ -9,43 +9,34 @@ import java.util.List;
 
 public class UsuarioDAO implements ICRUD<Usuario> {
 
-    private Connection conexion;
-
-    public UsuarioDAO() {
-        conexion = Conexion.getConexion();
-    }
-
     // ==========================
     // LOGIN
     // ==========================
 
     public Usuario iniciarSesion(String usuario, String contrasena) {
-
         Usuario user = null;
-
+        // Ajustado a la tabla nativa 'usuarios' y la columna 'contrasena'
         String sql = "SELECT * FROM usuarios WHERE usuario = ? AND contrasena = ?";
 
-        try {
+        try (Connection conexion = Conexion.getConexion();
+             PreparedStatement ps = conexion != null ? conexion.prepareStatement(sql) : null) {
 
-            PreparedStatement ps = conexion.prepareStatement(sql);
+            if (ps == null) return null;
 
             ps.setString(1, usuario);
             ps.setString(2, contrasena);
 
-            ResultSet rs = ps.executeQuery();
-
-            if (rs.next()) {
-
-                user = new Usuario();
-
-                user.setId(rs.getInt("id"));
-                user.setNombre(rs.getString("nombre"));
-                user.setApellido(rs.getString("apellido"));
-                user.setCorreo(rs.getString("correo"));
-                user.setUsuario(rs.getString("usuario"));
-                user.setContrasena(rs.getString("contrasena"));
-                user.setRol(rs.getString("rol"));
-
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    user = new Usuario();
+                    user.setId(rs.getInt("id"));
+                    user.setNombre(rs.getString("nombre"));
+                    user.setApellido(rs.getString("apellido"));
+                    user.setCorreo(rs.getString("correo"));
+                    user.setUsuario(rs.getString("usuario"));
+                    user.setContrasena(rs.getString("contrasena"));
+                    user.setRol(rs.getString("rol"));
+                }
             }
 
         } catch (SQLException e) {
@@ -53,7 +44,6 @@ public class UsuarioDAO implements ICRUD<Usuario> {
         }
 
         return user;
-
     }
 
     // ==========================
@@ -62,16 +52,15 @@ public class UsuarioDAO implements ICRUD<Usuario> {
 
     @Override
     public boolean guardar(Usuario usuario) {
-
         String sql = """
-                INSERT INTO usuarios
-                (nombre, apellido, correo, usuario, contrasena, rol)
-                VALUES(?,?,?,?,?,?)
+                INSERT INTO usuarios (nombre, apellido, correo, usuario, contrasena, rol)
+                VALUES (?, ?, ?, ?, ?, ?)
                 """;
 
-        try {
+        try (Connection conexion = Conexion.getConexion();
+             PreparedStatement ps = conexion != null ? conexion.prepareStatement(sql) : null) {
 
-            PreparedStatement ps = conexion.prepareStatement(sql);
+            if (ps == null) return false;
 
             ps.setString(1, usuario.getNombre());
             ps.setString(2, usuario.getApellido());
@@ -83,13 +72,10 @@ public class UsuarioDAO implements ICRUD<Usuario> {
             return ps.executeUpdate() > 0;
 
         } catch (SQLException e) {
-
             e.printStackTrace();
-
         }
 
         return false;
-
     }
 
     // ==========================
@@ -98,21 +84,21 @@ public class UsuarioDAO implements ICRUD<Usuario> {
 
     @Override
     public boolean actualizar(Usuario usuario) {
-
         String sql = """
                 UPDATE usuarios
-                SET nombre=?,
-                    apellido=?,
-                    correo=?,
-                    usuario=?,
-                    contrasena=?,
-                    rol=?
-                WHERE id=?
+                SET nombre = ?,
+                    apellido = ?,
+                    correo = ?,
+                    usuario = ?,
+                    contrasena = ?,
+                    rol = ?
+                WHERE id = ?
                 """;
 
-        try {
+        try (Connection conexion = Conexion.getConexion();
+             PreparedStatement ps = conexion != null ? conexion.prepareStatement(sql) : null) {
 
-            PreparedStatement ps = conexion.prepareStatement(sql);
+            if (ps == null) return false;
 
             ps.setString(1, usuario.getNombre());
             ps.setString(2, usuario.getApellido());
@@ -125,13 +111,10 @@ public class UsuarioDAO implements ICRUD<Usuario> {
             return ps.executeUpdate() > 0;
 
         } catch (SQLException e) {
-
             e.printStackTrace();
-
         }
 
         return false;
-
     }
 
     // ==========================
@@ -140,25 +123,22 @@ public class UsuarioDAO implements ICRUD<Usuario> {
 
     @Override
     public boolean eliminar(int id) {
+        String sql = "DELETE FROM usuarios WHERE id = ?";
 
-        String sql = "DELETE FROM usuarios WHERE id=?";
+        try (Connection conexion = Conexion.getConexion();
+             PreparedStatement ps = conexion != null ? conexion.prepareStatement(sql) : null) {
 
-        try {
-
-            PreparedStatement ps = conexion.prepareStatement(sql);
+            if (ps == null) return false;
 
             ps.setInt(1, id);
 
             return ps.executeUpdate() > 0;
 
         } catch (SQLException e) {
-
             e.printStackTrace();
-
         }
 
         return false;
-
     }
 
     // ==========================
@@ -167,19 +147,16 @@ public class UsuarioDAO implements ICRUD<Usuario> {
 
     @Override
     public List<Usuario> listar() {
-
         List<Usuario> lista = new ArrayList<>();
-
         String sql = "SELECT * FROM usuarios";
 
-        try {
+        try (Connection conexion = Conexion.getConexion();
+             Statement st = conexion != null ? conexion.createStatement() : null;
+             ResultSet rs = st != null ? st.executeQuery(sql) : null) {
 
-            Statement st = conexion.createStatement();
-
-            ResultSet rs = st.executeQuery(sql);
+            if (rs == null) return lista;
 
             while (rs.next()) {
-
                 Usuario usuario = new Usuario();
 
                 usuario.setId(rs.getInt("id"));
@@ -191,17 +168,41 @@ public class UsuarioDAO implements ICRUD<Usuario> {
                 usuario.setRol(rs.getString("rol"));
 
                 lista.add(usuario);
-
             }
 
         } catch (SQLException e) {
-
             e.printStackTrace();
-
         }
 
         return lista;
-
     }
 
+    // Agregamos buscarPorId para mantener consistencia absoluta con la interfaz ICRUD
+    public Usuario buscarPorId(int id) {
+        String sql = "SELECT * FROM usuarios WHERE id = ?";
+
+        try (Connection conexion = Conexion.getConexion();
+             PreparedStatement ps = conexion != null ? conexion.prepareStatement(sql) : null) {
+
+            if (ps == null) return null;
+            ps.setInt(1, id);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    Usuario usuario = new Usuario();
+                    usuario.setId(rs.getInt("id"));
+                    usuario.setNombre(rs.getString("nombre"));
+                    usuario.setApellido(rs.getString("apellido"));
+                    usuario.setCorreo(rs.getString("correo"));
+                    usuario.setUsuario(rs.getString("usuario"));
+                    usuario.setContrasena(rs.getString("contrasena"));
+                    usuario.setRol(rs.getString("rol"));
+                    return usuario;
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 }

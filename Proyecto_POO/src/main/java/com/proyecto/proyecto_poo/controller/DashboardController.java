@@ -10,87 +10,202 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 import javafx.scene.Scene;
 
 public class DashboardController {
 
-    // ... (tus campos @FXML existentes) ...
     @FXML private Label lblUsuario;
     @FXML private Label lblRol;
     @FXML private Button btnProfesores;
-    @FXML private Button btnEstudiantes;
+    @FXML private Button btnEstudiantes;      // "Vista Estudiante"
+    @FXML private Button btnMiPanelEstudiante; // "Estudiantes" (Gestión CRUD)
     @FXML private Button btnReportes;
-    @FXML private AnchorPane panelPrincipal;
-
-    // AÑADE ESTAS CONSTANTES PARA LOS ESTILOS
-    private final String ESTILO_ACTIVO = "-fx-background-color: #7c3aed; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8; -fx-alignment: BASELINE_LEFT; -fx-padding: 0 0 0 20;";
-    private final String ESTILO_INACTIVO = "-fx-background-color: transparent; -fx-text-fill: #c0c6d9; -fx-font-size: 14px; -fx-alignment: BASELINE_LEFT; -fx-padding: 0 0 0 20;";
+    @FXML private Button btnAsignacion;
+    @FXML private StackPane panelPrincipal;
 
     @FXML
     public void initialize() {
         Usuario usuario = Sesion.getUsuario();
-        lblUsuario.setText("Bienvenido: " + usuario.getNombre());
-        lblRol.setText("Rol: " + usuario.getRol());
-        configurarPermisos(usuario.getRol());
+
+        if (usuario != null) {
+            lblUsuario.setText(usuario.getNombre());
+            lblRol.setText("Rol: " + usuario.getRol().toUpperCase());
+            configurarPermisos(usuario.getRol());
+        } else {
+            lblUsuario.setText("Desconocido");
+            lblRol.setText("Rol: ---");
+        }
     }
 
-    private void configurarPermisos(String rol){
+    private void configurarPermisos(String rol) {
+        if (rol == null) return;
 
-        switch (rol){
+        // --- Configuración por defecto (Resetear estados) ---
+        btnProfesores.setVisible(true);
+        btnProfesores.setManaged(true);
+        btnProfesores.setDisable(false);
 
+        btnEstudiantes.setVisible(true);
+        btnEstudiantes.setManaged(true);
+        btnEstudiantes.setDisable(false);
+
+        btnMiPanelEstudiante.setVisible(true);
+        btnMiPanelEstudiante.setManaged(true);
+        btnMiPanelEstudiante.setDisable(false);
+
+        btnReportes.setVisible(true);
+        btnReportes.setManaged(true);
+        btnReportes.setDisable(false);
+
+        if (btnAsignacion != null) {
+            btnAsignacion.setVisible(true);
+            btnAsignacion.setManaged(true);
+            btnAsignacion.setDisable(false);
+        }
+
+        // --- Aplicación estricta de Reglas de Roles ---
+        switch (rol.toUpperCase().trim()) {
             case "ADMIN":
-                // Si es admin, no hacemos nada (todo está habilitado)
+                // Admin ve gestión global de estudiantes, NO ve su panel personal ni reportes generales
+                btnReportes.setDisable(true);
+                btnReportes.setManaged(false);
+                btnEstudiantes.setVisible(false);
+                btnEstudiantes.setManaged(false);
                 break;
 
             case "PROFESOR":
-                btnProfesores.setDisable(true);
+                // Profesor ÚNICAMENTE ve Reportes. Se oculta y desvincula todo lo demás
+                btnProfesores.setVisible(false);
+                btnProfesores.setManaged(false);
+
+                btnMiPanelEstudiante.setVisible(false);
+                btnMiPanelEstudiante.setManaged(false);
+
+                btnEstudiantes.setVisible(false);
+                btnEstudiantes.setManaged(false);
+
+                btnReportes.setVisible(true);
+                btnReportes.setManaged(true);
+
+                if (btnAsignacion != null) {
+                    btnAsignacion.setVisible(false);
+                    btnAsignacion.setManaged(false);
+                }
                 break;
 
             case "ESTUDIANTE":
-                btnProfesores.setDisable(true);
-                btnReportes.setDisable(true);
+                // Estudiante SOLO debe ver la "Vista Estudiante" (Panel Académico). Se oculta reportes.
+                btnProfesores.setVisible(false);
+                btnProfesores.setManaged(false);
+
+                if (btnAsignacion != null) {
+                    btnAsignacion.setVisible(false);
+                    btnAsignacion.setManaged(false);
+                }
+
+                btnMiPanelEstudiante.setVisible(false);
+                btnMiPanelEstudiante.setManaged(false);
+
+                // Ocultamos el botón de reportes global para que no aparezca en el menú
+                btnReportes.setVisible(false);
+                btnReportes.setManaged(false);
                 break;
         }
     }
 
-    // AÑADE ESTE MÉTODO AUXILIAR
     private void activarBoton(Button botonActivo) {
-        // Limpiamos estilos y quitamos clase activo
-        btnProfesores.getStyleClass().remove("boton-menu-activo");
-        btnEstudiantes.getStyleClass().remove("boton-menu-activo");
-        btnReportes.getStyleClass().remove("boton-menu-activo");
+        if (btnProfesores != null) btnProfesores.getStyleClass().remove("boton-menu-activo");
+        if (btnEstudiantes != null) btnEstudiantes.getStyleClass().remove("boton-menu-activo");
+        if (btnMiPanelEstudiante != null) btnMiPanelEstudiante.getStyleClass().remove("boton-menu-activo");
+        if (btnReportes != null) btnReportes.getStyleClass().remove("boton-menu-activo");
+        if (btnAsignacion != null) btnAsignacion.getStyleClass().remove("boton-menu-activo");
 
-        // Aplicamos clase activo al nuevo
-        botonActivo.getStyleClass().add("boton-menu-activo");
+        if (botonActivo != null) {
+            botonActivo.getStyleClass().add("boton-menu-activo");
+        }
     }
 
-    // ACTUALIZA TUS MÉTODOS DE NAVEGACIÓN
     @FXML
-    private void abrirProfesores(){
+    private void abrirProfesores() {
+        Usuario actual = Sesion.getUsuario();
+        if (actual == null || !"ADMIN".equalsIgnoreCase(actual.getRol().trim())) {
+            System.out.println("Acceso denegado a la Gestión de Profesores.");
+            return;
+        }
         cargarVista("/view/profesores.fxml");
         activarBoton(btnProfesores);
     }
 
+    /**
+     * Corresponde a "Vista Estudiante" (Acceso exclusivo para el ESTUDIANTE)
+     */
     @FXML
-    private void abrirEstudiantes(){
+    private void abrirEstudiantes() {
+        Usuario actual = Sesion.getUsuario();
+        if (actual == null || !"ESTUDIANTE".equalsIgnoreCase(actual.getRol().trim())) {
+            System.out.println("Acceso denegado a Vista Estudiante.");
+            return;
+        }
         cargarVista("/view/estudiantes.fxml");
         activarBoton(btnEstudiantes);
     }
 
+    /**
+     * Corresponde al botón "Estudiantes" (Gestión global CRUD de alumnos)
+     */
     @FXML
-    private void abrirReportes(){
+    private void abrirMiPanelEstudiante() {
+        Usuario actual = Sesion.getUsuario();
+        if (actual == null || !"ADMIN".equalsIgnoreCase(actual.getRol().trim())) {
+            System.out.println("Acceso denegado a la Gestión de Estudiantes.");
+            return;
+        }
+        cargarVista("/view/AdminEstudiantes.fxml");
+        activarBoton(btnMiPanelEstudiante);
+    }
+
+    @FXML
+    private void abrirReportes() {
+        // Bloquea por completo el clic en caso de que intentaran acceder siendo ADMIN o ESTUDIANTE
+        Usuario actual = Sesion.getUsuario();
+        if (actual == null || !"PROFESOR".equalsIgnoreCase(actual.getRol().trim())) {
+            System.out.println("Acceso denegado al menú de reportes.");
+            return;
+        }
+
         cargarVista("/view/reportes.fxml");
         activarBoton(btnReportes);
     }
 
-    private void cargarVista(String ruta){
-        try{
-            Parent vista = FXMLLoader.load(MainApp.class.getResource(ruta));
+    @FXML
+    private void abrirAsignaciones() {
+        Usuario actual = Sesion.getUsuario();
+        if (actual == null || !"ADMIN".equalsIgnoreCase(actual.getRol().trim())) {
+            System.out.println("Acceso denegado al menú de asignaciones.");
+            return;
+        }
+        cargarVista("/view/asignacion.fxml");
+        activarBoton(btnAsignacion);
+    }
+
+    private void cargarVista(String ruta) {
+        try {
+            java.net.URL url = MainApp.class.getResource(ruta);
+            if (url == null) {
+                System.err.println("ERROR: No se encontró el archivo FXML en: " + ruta);
+                return;
+            }
+
+            FXMLLoader loader = new FXMLLoader(url);
+            Parent vista = loader.load();
+
             panelPrincipal.getChildren().clear();
             panelPrincipal.getChildren().add(vista);
-        }catch(Exception e){
+            System.out.println(" Vista acoplada con éxito: " + ruta);
+        } catch (Exception e) {
+            System.err.println("ERROR CRÍTICO AL INICIALIZAR LA VISTA INTERNA DE: " + ruta);
             e.printStackTrace();
         }
     }
@@ -107,6 +222,4 @@ public class DashboardController {
             ex.printStackTrace();
         }
     }
-
-    // ... (tu método cerrarSesion sigue igual) ...
 }

@@ -9,24 +9,17 @@ import java.util.List;
 
 public class EstudianteDAO implements ICRUD<Estudiante> {
 
-    private Connection conexion;
-
-    public EstudianteDAO() {
-        conexion = Conexion.getConexion();
-    }
-
     @Override
     public boolean guardar(Estudiante estudiante) {
-
         String sql = """
-                INSERT INTO estudiantes
-                (nombre, apellido, cedula, carrera, nivel, correo)
+                INSERT INTO estudiantes (nombre, apellido, cedula, carrera, nivel, correo)
                 VALUES (?, ?, ?, ?, ?, ?)
                 """;
 
-        try {
+        try (Connection conexion = Conexion.getConexion();
+             PreparedStatement ps = conexion != null ? conexion.prepareStatement(sql) : null) {
 
-            PreparedStatement ps = conexion.prepareStatement(sql);
+            if (ps == null) return false;
 
             ps.setString(1, estudiante.getNombre());
             ps.setString(2, estudiante.getApellido());
@@ -38,32 +31,28 @@ public class EstudianteDAO implements ICRUD<Estudiante> {
             return ps.executeUpdate() > 0;
 
         } catch (SQLException e) {
-
             e.printStackTrace();
-
         }
-
         return false;
-
     }
 
     @Override
     public boolean actualizar(Estudiante estudiante) {
-
         String sql = """
                 UPDATE estudiantes
-                SET nombre=?,
-                    apellido=?,
-                    cedula=?,
-                    carrera=?,
-                    nivel=?,
-                    correo=?
-                WHERE id=?
+                SET nombre = ?,
+                    apellido = ?,
+                    cedula = ?,
+                    carrera = ?,
+                    nivel = ?,
+                    correo = ?
+                WHERE id = ?
                 """;
 
-        try {
+        try (Connection conexion = Conexion.getConexion();
+             PreparedStatement ps = conexion != null ? conexion.prepareStatement(sql) : null) {
 
-            PreparedStatement ps = conexion.prepareStatement(sql);
+            if (ps == null) return false;
 
             ps.setString(1, estudiante.getNombre());
             ps.setString(2, estudiante.getApellido());
@@ -76,55 +65,44 @@ public class EstudianteDAO implements ICRUD<Estudiante> {
             return ps.executeUpdate() > 0;
 
         } catch (SQLException e) {
-
             e.printStackTrace();
-
         }
-
         return false;
-
     }
 
     @Override
     public boolean eliminar(int id) {
+        String sql = "DELETE FROM estudiantes WHERE id = ?";
 
-        String sql = "DELETE FROM estudiantes WHERE id=?";
+        try (Connection conexion = Conexion.getConexion();
+             PreparedStatement ps = conexion != null ? conexion.prepareStatement(sql) : null) {
 
-        try {
-
-            PreparedStatement ps = conexion.prepareStatement(sql);
-
+            if (ps == null) return false;
             ps.setInt(1, id);
 
             return ps.executeUpdate() > 0;
 
         } catch (SQLException e) {
-
             e.printStackTrace();
-
         }
-
         return false;
-
     }
 
     @Override
     public List<Estudiante> listar() {
-
         List<Estudiante> lista = new ArrayList<>();
-
         String sql = "SELECT * FROM estudiantes";
 
-        try {
+        try (Connection conexion = Conexion.getConexion();
+             Statement st = conexion != null ? conexion.createStatement() : null;
+             ResultSet rs = st != null ? st.executeQuery(sql) : null) {
 
-            Statement st = conexion.createStatement();
-
-            ResultSet rs = st.executeQuery(sql);
+            if (rs == null) return lista;
 
             while (rs.next()) {
-
                 Estudiante estudiante = new Estudiante();
 
+                // Mapeo directo uno a uno con las columnas reales
                 estudiante.setId(rs.getInt("id"));
                 estudiante.setNombre(rs.getString("nombre"));
                 estudiante.setApellido(rs.getString("apellido"));
@@ -134,55 +112,41 @@ public class EstudianteDAO implements ICRUD<Estudiante> {
                 estudiante.setCorreo(rs.getString("correo"));
 
                 lista.add(estudiante);
-
             }
 
         } catch (SQLException e) {
-
             e.printStackTrace();
-
         }
-
         return lista;
-
     }
 
     public Estudiante buscarPorId(int id) {
+        String sql = "SELECT * FROM estudiantes WHERE id = ?";
 
-        String sql = "SELECT * FROM estudiantes WHERE id=?";
+        try (Connection conexion = Conexion.getConexion();
+             PreparedStatement ps = conexion != null ? conexion.prepareStatement(sql) : null) {
 
-        try {
-
-            PreparedStatement ps = conexion.prepareStatement(sql);
-
+            if (ps == null) return null;
             ps.setInt(1, id);
 
-            ResultSet rs = ps.executeQuery();
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    Estudiante estudiante = new Estudiante();
 
-            if (rs.next()) {
+                    estudiante.setId(rs.getInt("id"));
+                    estudiante.setNombre(rs.getString("nombre"));
+                    estudiante.setApellido(rs.getString("apellido"));
+                    estudiante.setCedula(rs.getString("cedula"));
+                    estudiante.setCarrera(rs.getString("carrera"));
+                    estudiante.setNivel(rs.getInt("nivel"));
+                    estudiante.setCorreo(rs.getString("correo"));
 
-                Estudiante estudiante = new Estudiante();
-
-                estudiante.setId(rs.getInt("id"));
-                estudiante.setNombre(rs.getString("nombre"));
-                estudiante.setApellido(rs.getString("apellido"));
-                estudiante.setCedula(rs.getString("cedula"));
-                estudiante.setCarrera(rs.getString("carrera"));
-                estudiante.setNivel(rs.getInt("nivel"));
-                estudiante.setCorreo(rs.getString("correo"));
-
-                return estudiante;
-
+                    return estudiante;
+                }
             }
-
         } catch (SQLException e) {
-
             e.printStackTrace();
-
         }
-
         return null;
-
     }
-
 }

@@ -1,237 +1,110 @@
 package com.proyecto.proyecto_poo.controller;
 
 import com.proyecto.proyecto_poo.dao.EstudianteDAO;
+import com.proyecto.proyecto_poo.dao.ReporteDAO;
 import com.proyecto.proyecto_poo.model.Estudiante;
-
+import com.proyecto.proyecto_poo.model.Reporte;
+import com.proyecto.proyecto_poo.util.Sesion;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.text.Text;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class EstudianteController {
 
-    @FXML
-    private TextField txtNombre;
+    // Campos de datos personales (Panel Izquierdo)
+    @FXML private TextField txtNombre, txtApellido, txtCedula, txtCarrera, txtNivel, txtCorreo;
 
-    @FXML
-    private TextField txtApellido;
+    // Tabla superior (Datos Reporte / Profesor)
+    @FXML private TableView<Reporte> tablaDatosEstudiante;
+    @FXML private TableColumn<Reporte, String> colTituloReporte;
+    @FXML private TableColumn<Reporte, String> colNombreProfesor;
+    @FXML private TableColumn<Reporte, String> colEspecialidadProfesor;
 
-    @FXML
-    private TextField txtCedula;
+    // Tabla inferior (Descripción)
+    @FXML private TableView<Reporte> tablaDescripcion;
+    @FXML private TableColumn<Reporte, String> colDescripcion;
 
-    @FXML
-    private TextField txtCarrera;
+    private final EstudianteDAO estudianteDao = new EstudianteDAO();
+    private final ReporteDAO reporteDao = new ReporteDAO();
 
-    @FXML
-    private TextField txtNivel;
-
-    @FXML
-    private TextField txtCorreo;
-
-    @FXML
-    private TableView<Estudiante> tablaEstudiantes;
-
-    @FXML
-    private TableColumn<Estudiante, Integer> colId;
-
-    @FXML
-    private TableColumn<Estudiante, String> colNombre;
-
-    @FXML
-    private TableColumn<Estudiante, String> colApellido;
-
-    @FXML
-    private TableColumn<Estudiante, String> colCedula;
-
-    @FXML
-    private TableColumn<Estudiante, String> colCarrera;
-
-    @FXML
-    private TableColumn<Estudiante, Integer> colNivel;
-
-    private final EstudianteDAO dao = new EstudianteDAO();
-
-    private final ObservableList<Estudiante> lista =
-            FXCollections.observableArrayList();
+    private final ObservableList<Reporte> listaReportes = FXCollections.observableArrayList();
 
     @FXML
     public void initialize() {
+        // Enlazar columnas de la Tabla Superior
+        colTituloReporte.setCellValueFactory(new PropertyValueFactory<>("titulo"));
+        colNombreProfesor.setCellValueFactory(new PropertyValueFactory<>("nombreProfesor"));
+        colEspecialidadProfesor.setCellValueFactory(new PropertyValueFactory<>("especialidadProfesor"));
+        tablaDatosEstudiante.setItems(listaReportes);
 
-        colId.setCellValueFactory(new PropertyValueFactory<>("id"));
-        colNombre.setCellValueFactory(new PropertyValueFactory<>("nombre"));
-        colApellido.setCellValueFactory(new PropertyValueFactory<>("apellido"));
-        colCedula.setCellValueFactory(new PropertyValueFactory<>("cedula"));
-        colCarrera.setCellValueFactory(new PropertyValueFactory<>("carrera"));
-        colNivel.setCellValueFactory(new PropertyValueFactory<>("nivel"));
+        // Enlazar columna de la Tabla Inferior
+        colDescripcion.setCellValueFactory(new PropertyValueFactory<>("descripcion"));
+        tablaDescripcion.setItems(listaReportes);
 
-        cargarTabla();
-
-        tablaEstudiantes.getSelectionModel().selectedItemProperty().addListener(
-                (observable, anterior, estudiante) -> {
-
-                    if (estudiante != null) {
-
-                        txtNombre.setText(estudiante.getNombre());
-                        txtApellido.setText(estudiante.getApellido());
-                        txtCedula.setText(estudiante.getCedula());
-                        txtCarrera.setText(estudiante.getCarrera());
-                        txtNivel.setText(String.valueOf(estudiante.getNivel()));
-                        txtCorreo.setText(estudiante.getCorreo());
-
-                    }
-
-                });
-
-    }
-
-    private void cargarTabla() {
-
-        lista.clear();
-        lista.addAll(dao.listar());
-        tablaEstudiantes.setItems(lista);
-
+        // Ajuste automático de texto (Word Wrap) para descripciones largas
+        colDescripcion.setCellFactory(tc -> new TableCell<>() {
+            private final Text text = new Text();
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setGraphic(null);
+                } else {
+                    text.setText(item);
+                    text.setStyle("-fx-fill: white;"); // Color blanco para el diseño oscuro
+                    text.wrappingWidthProperty().bind(colDescripcion.widthProperty().subtract(15));
+                    setGraphic(text);
+                }
+            }
+        });
     }
 
     @FXML
-    private void guardar() {
+    private void leer() {
+        int idLogueado = Sesion.getInstancia().getIdUsuarioLogueado();
+        Estudiante estudiante = estudianteDao.buscarPorId(idLogueado);
 
-        if (!validarCampos()) {
-            return;
-        }
-
-        try {
-
-            Estudiante estudiante = new Estudiante();
-
-            estudiante.setNombre(txtNombre.getText().trim());
-            estudiante.setApellido(txtApellido.getText().trim());
-            estudiante.setCedula(txtCedula.getText().trim());
-            estudiante.setCarrera(txtCarrera.getText().trim());
-            estudiante.setNivel(Integer.parseInt(txtNivel.getText().trim()));
-            estudiante.setCorreo(txtCorreo.getText().trim());
-
-            if (dao.guardar(estudiante)) {
-                limpiar();
-                cargarTabla();
+        if (estudiante != null) {
+            // Rellenar campos de texto izquierdos
+            txtNombre.setText(estudiante.getNombre());
+            txtApellido.setText(estudiante.getApellido());
+            txtCedula.setText(estudiante.getCedula());
+            txtCarrera.setText(estudiante.getCarrera());
+            txtNivel.setText(String.valueOf(estudiante.getNivel()));
+            if (txtCorreo != null) {
+                txtCorreo.setText(estudiante.getCorreo());
             }
 
-        } catch (NumberFormatException e) {
-            mostrarAlerta("Error", "El nivel debe ser un número entero.");
+            // Cargar y filtrar reportes correspondientes en las tablas
+            cargarReportes(estudiante.getId());
+        } else {
+            mostrarAlerta("Error", "No se encontraron los datos del estudiante.");
         }
     }
 
-    @FXML
-    private void actualizar() {
+    private void cargarReportes(int estudianteId) {
+        listaReportes.clear();
+        List<Reporte> todos = reporteDao.listar();
 
-        Estudiante estudiante = tablaEstudiantes.getSelectionModel().getSelectedItem();
+        // Filtrar para que el estudiante solo vea sus filas correspondientes (usuario_id)
+        List<Reporte> filtrados = todos.stream()
+                .filter(r -> r.getUsuarioId() == estudianteId)
+                .collect(Collectors.toList());
 
-        if (estudiante == null) {
-            mostrarAlerta("Aviso", "Seleccione un estudiante para actualizar.");
-            return;
-        }
-
-        if (!validarCampos()) {
-            return;
-        }
-
-        try {
-
-            estudiante.setNombre(txtNombre.getText().trim());
-            estudiante.setApellido(txtApellido.getText().trim());
-            estudiante.setCedula(txtCedula.getText().trim());
-            estudiante.setCarrera(txtCarrera.getText().trim());
-            estudiante.setNivel(Integer.parseInt(txtNivel.getText().trim()));
-            estudiante.setCorreo(txtCorreo.getText().trim());
-
-            dao.actualizar(estudiante);
-
-            limpiar();
-            cargarTabla();
-
-        } catch (NumberFormatException e) {
-            mostrarAlerta("Error", "El nivel debe ser un número entero.");
-        }
-    }
-
-    @FXML
-    private void eliminar() {
-
-        Estudiante estudiante = tablaEstudiantes.getSelectionModel().getSelectedItem();
-
-        if (estudiante == null) {
-            mostrarAlerta("Aviso", "Seleccione un estudiante para eliminar.");
-            return;
-        }
-
-        dao.eliminar(estudiante.getId());
-
-        limpiar();
-        cargarTabla();
-    }
-
-    /**
-     * Valida que todos los campos estén llenos.
-     */
-    private boolean validarCampos() {
-
-        if (txtNombre.getText().trim().isEmpty()) {
-            mostrarAlerta("Campo vacío", "Ingrese el nombre.");
-            txtNombre.requestFocus();
-            return false;
-        }
-
-        if (txtApellido.getText().trim().isEmpty()) {
-            mostrarAlerta("Campo vacío", "Ingrese el apellido.");
-            txtApellido.requestFocus();
-            return false;
-        }
-
-        if (txtCedula.getText().trim().isEmpty()) {
-            mostrarAlerta("Campo vacío", "Ingrese la cédula.");
-            txtCedula.requestFocus();
-            return false;
-        }
-
-        if (txtCarrera.getText().trim().isEmpty()) {
-            mostrarAlerta("Campo vacío", "Ingrese la carrera.");
-            txtCarrera.requestFocus();
-            return false;
-        }
-
-        if (txtNivel.getText().trim().isEmpty()) {
-            mostrarAlerta("Campo vacío", "Ingrese el nivel.");
-            txtNivel.requestFocus();
-            return false;
-        }
-
-        if (txtCorreo.getText().trim().isEmpty()) {
-            mostrarAlerta("Campo vacío", "Ingrese el correo.");
-            txtCorreo.requestFocus();
-            return false;
-        }
-
-        return true;
-    }
-
-    private void limpiar() {
-
-        txtNombre.clear();
-        txtApellido.clear();
-        txtCedula.clear();
-        txtCarrera.clear();
-        txtNivel.clear();
-        txtCorreo.clear();
-
-        tablaEstudiantes.getSelectionModel().clearSelection();
+        listaReportes.addAll(filtrados);
     }
 
     private void mostrarAlerta(String titulo, String mensaje) {
-
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle(titulo);
         alert.setHeaderText(null);
         alert.setContentText(mensaje);
-        alert.showAndWait();
+        alert.show();
     }
 }

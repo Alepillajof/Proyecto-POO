@@ -5,20 +5,23 @@ import com.proyecto.proyecto_poo.model.Profesor;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.collections.transformation.FilteredList; // Import necesario
+import javafx.collections.transformation.FilteredList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 
+import java.util.List;
+
 public class ProfesorController {
 
+    // Componentes del Formulario Izquierdo
     @FXML private TextField txtNombre;
     @FXML private TextField txtApellido;
     @FXML private TextField txtCedula;
     @FXML private TextField txtEspecialidad;
-    @FXML private TextField txtCorreo;
-    @FXML private TextField txtBuscar; // ID del campo de búsqueda en FXML
 
+    // Componentes de la Tabla Derecha
+    @FXML private TextField txtBuscar;
     @FXML private TableView<Profesor> tablaProfesores;
     @FXML private TableColumn<Profesor, Integer> colId;
     @FXML private TableColumn<Profesor, String> colNombre;
@@ -27,137 +30,231 @@ public class ProfesorController {
     @FXML private TableColumn<Profesor, String> colEspecialidad;
 
     private final ProfesorDAO dao = new ProfesorDAO();
-    private final ObservableList<Profesor> lista = FXCollections.observableArrayList();
-    private FilteredList<Profesor> filteredData; // Lista filtrada
+    private final ObservableList<Profesor> listaProfesores = FXCollections.observableArrayList();
+    private FilteredList<Profesor> filteredData;
+
+    private Profesor profesorSeleccionado;
 
     @FXML
     public void initialize() {
+
         colId.setCellValueFactory(new PropertyValueFactory<>("id"));
         colNombre.setCellValueFactory(new PropertyValueFactory<>("nombre"));
         colApellido.setCellValueFactory(new PropertyValueFactory<>("apellido"));
         colCedula.setCellValueFactory(new PropertyValueFactory<>("cedula"));
         colEspecialidad.setCellValueFactory(new PropertyValueFactory<>("especialidad"));
 
-        cargarTabla();
+        // --- RESTRICCIÓN EN TIEMPO REAL PARA EL TEXTFIELD DE CÉDULA ---
+        // Escucha los cambios de texto e impide escribir más de 10 caracteres o letras
+        txtCedula.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue == null) return;
 
-        // Configuración del buscador
-        filteredData = new FilteredList<>(lista, b -> true);
+            // Reemplaza todo lo que no sea un número numérico entero
+            String soloNumeros = newValue.replaceAll("[^\\d]", "");
+
+            // Si excede los 10 dígitos, corta el texto sobrante
+            if (soloNumeros.length() > 10) {
+                soloNumeros = soloNumeros.substring(0, 10);
+            }
+
+            // Aplica el valor limpio si es diferente al original ingresado
+            if (!newValue.equals(soloNumeros)) {
+                txtCedula.setText(soloNumeros);
+            }
+        });
+
+        filteredData = new FilteredList<>(listaProfesores, b -> true);
 
         txtBuscar.textProperty().addListener((observable, oldValue, newValue) -> {
             filteredData.setPredicate(profesor -> {
-                if (newValue == null || newValue.isEmpty()) return true;
 
-                String lowerCaseFilter = newValue.toLowerCase();
+                if (newValue == null || newValue.isEmpty()) {
+                    return true;
+                }
 
-                // Filtra por nombre, apellido o cédula
-                if (profesor.getNombre().toLowerCase().contains(lowerCaseFilter)) return true;
-                if (profesor.getApellido().toLowerCase().contains(lowerCaseFilter)) return true;
-                if (profesor.getCedula().contains(lowerCaseFilter)) return true;
+                String filtro = newValue.toLowerCase();
 
-                return false;
+                return profesor.getNombre().toLowerCase().contains(filtro)
+                        || profesor.getApellido().toLowerCase().contains(filtro)
+                        || profesor.getCedula().contains(filtro)
+                        || profesor.getEspecialidad().toLowerCase().contains(filtro);
             });
         });
 
-        tablaProfesores.setItems(filteredData); // Vinculamos la lista filtrada
+        tablaProfesores.setItems(filteredData);
 
         tablaProfesores.getSelectionModel().selectedItemProperty().addListener(
-                (observable, anterior, profesor) -> {
-                    if (profesor != null) {
-                        txtNombre.setText(profesor.getNombre());
-                        txtApellido.setText(profesor.getApellido());
-                        txtCedula.setText(profesor.getCedula());
-                        txtEspecialidad.setText(profesor.getEspecialidad());
-                        txtCorreo.setText(profesor.getCorreo());
+                (observable, anterior, seleccionado) -> {
+
+                    if (seleccionado != null) {
+
+                        profesorSeleccionado = seleccionado;
+
+                        txtNombre.setText(seleccionado.getNombre());
+                        txtApellido.setText(seleccionado.getApellido());
+                        txtCedula.setText(seleccionado.getCedula());
+                        txtEspecialidad.setText(seleccionado.getEspecialidad());
                     }
                 });
+
+        cargarTabla();
+    }
+
+    @FXML
+    private void leer() {
+        cargarTabla();
+        mostrarAlerta(Alert.AlertType.INFORMATION,
+                "Sincronización",
+                "Datos actualizados desde la base de datos.");
     }
 
     private void cargarTabla() {
-        lista.clear();
-        lista.addAll(dao.listar());
-        // No hace falta setear setItems aquí porque el FilteredList ya está vinculado
+        listaProfesores.clear();
+        List<Profesor> profesoresDB = dao.listar();
+
+        if (profesoresDB != null) {
+            listaProfesores.addAll(profesoresDB);
+        }
     }
 
     @FXML
     private void guardar() {
-        if (!validarCampos()) return;
+        if (validarCampos()) {
+            return;
+        }
 
-        Profesor profesor = new Profesor();
-        profesor.setNombre(txtNombre.getText().trim());
-        profesor.setApellido(txtApellido.getText().trim());
-        profesor.setCedula(txtCedula.getText().trim());
-        profesor.setEspecialidad(txtEspecialidad.getText().trim());
-        profesor.setCorreo(txtCorreo.getText().trim());
+        Profesor nuevoProfesor = obtenerDatosFormulario();
 
-        if (dao.guardar(profesor)) {
-            limpiar();
+        if (dao.guardar(nuevoProfesor)) {
+            mostrarAlerta(Alert.AlertType.INFORMATION,
+                    "Éxito",
+                    "Profesor registrado correctamente.\nSu correo y usuario institucional han sido autogenerados.");
+
+            limpiarFormulario();
             cargarTabla();
+        } else {
+            mostrarAlerta(Alert.AlertType.ERROR,
+                    "Error",
+                    "No se pudo registrar al profesor.");
         }
     }
 
     @FXML
     private void actualizar() {
-        Profesor profesor = tablaProfesores.getSelectionModel().getSelectedItem();
-        if (profesor == null) {
-            mostrarAlerta("Aviso", "Seleccione un profesor para actualizar.");
+        if (profesorSeleccionado == null) {
+            mostrarAlerta(Alert.AlertType.WARNING,
+                    "Aviso",
+                    "Por favor, seleccione un profesor de la tabla.");
             return;
         }
-        if (!validarCampos()) return;
 
-        profesor.setNombre(txtNombre.getText().trim());
-        profesor.setApellido(txtApellido.getText().trim());
-        profesor.setCedula(txtCedula.getText().trim());
-        profesor.setEspecialidad(txtEspecialidad.getText().trim());
-        profesor.setCorreo(txtCorreo.getText().trim());
+        if (validarCampos()) {
+            return;
+        }
 
-        dao.actualizar(profesor);
-        limpiar();
-        cargarTabla();
+        Profesor modificado = obtenerDatosFormulario();
+        modificado.setId(profesorSeleccionado.getId());
+
+        if (dao.actualizar(modificado)) {
+            mostrarAlerta(Alert.AlertType.INFORMATION,
+                    "Éxito",
+                    "Datos del profesor actualizados correctamente.");
+
+            limpiarFormulario();
+            cargarTabla();
+        } else {
+            mostrarAlerta(Alert.AlertType.ERROR,
+                    "Error",
+                    "No se pudo actualizar la información.");
+        }
     }
 
     @FXML
     private void eliminar() {
-        Profesor profesor = tablaProfesores.getSelectionModel().getSelectedItem();
-        if (profesor == null) {
-            mostrarAlerta("Aviso", "Seleccione un profesor para eliminar.");
+        if (profesorSeleccionado == null) {
+            mostrarAlerta(Alert.AlertType.WARNING,
+                    "Aviso",
+                    "Por favor, seleccione un profesor de la tabla.");
             return;
         }
-        dao.eliminar(profesor.getId());
-        limpiar();
-        cargarTabla();
+
+        Alert confirmacion = new Alert(
+                Alert.AlertType.CONFIRMATION,
+                "¿Está seguro de eliminar a este profesor? Se borrarán sus credenciales.",
+                ButtonType.YES,
+                ButtonType.NO
+        );
+
+        confirmacion.setTitle("Confirmar Eliminación");
+        confirmacion.setHeaderText(null);
+
+        if (confirmacion.showAndWait().orElse(ButtonType.NO) == ButtonType.YES) {
+            if (dao.eliminar(profesorSeleccionado)) {
+                mostrarAlerta(Alert.AlertType.INFORMATION,
+                        "Éxito",
+                        "Profesor removido del sistema.");
+
+                limpiarFormulario();
+                cargarTabla();
+            } else {
+                mostrarAlerta(Alert.AlertType.ERROR,
+                        "Error",
+                        "No se pudo eliminar el registro.");
+            }
+        }
     }
 
-    private boolean validarCampos() {
-        if (txtNombre.getText().trim().isEmpty()) { mostrarAlerta("Campo vacío", "Ingrese el nombre."); return false; }
-        if (txtApellido.getText().trim().isEmpty()) { mostrarAlerta("Campo vacío", "Ingrese el apellido."); return false; }
-        if (txtCedula.getText().trim().isEmpty()) { mostrarAlerta("Campo vacío", "Ingrese la cédula."); return false; }
-        if (txtEspecialidad.getText().trim().isEmpty()) { mostrarAlerta("Campo vacío", "Ingrese la especialidad."); return false; }
-        if (txtCorreo.getText().trim().isEmpty()) { mostrarAlerta("Campo vacío", "Ingrese el correo."); return false; }
-        return true;
-    }
-
-    private void limpiar() {
+    @FXML
+    private void limpiarFormulario() {
         txtNombre.clear();
         txtApellido.clear();
         txtCedula.clear();
         txtEspecialidad.clear();
-        txtCorreo.clear();
+
+        profesorSeleccionado = null;
         tablaProfesores.getSelectionModel().clearSelection();
     }
 
-    private void mostrarAlerta(String titulo, String mensaje) {
-        Alert alert = new Alert(Alert.AlertType.ERROR);
+    private Profesor obtenerDatosFormulario() {
+        Profesor p = new Profesor();
+        p.setNombre(txtNombre.getText().trim());
+        p.setApellido(txtApellido.getText().trim());
+        p.setCedula(txtCedula.getText().trim());
+        p.setEspecialidad(txtEspecialidad.getText().trim());
+        return p;
+    }
+
+    private boolean validarCampos() {
+        if (txtNombre.getText().trim().isEmpty() ||
+                txtApellido.getText().trim().isEmpty() ||
+                txtCedula.getText().trim().isEmpty() ||
+                txtEspecialidad.getText().trim().isEmpty()) {
+
+            mostrarAlerta(Alert.AlertType.WARNING,
+                    "Campos Incompletos",
+                    "Debe rellenar todos los campos del formulario.");
+            return true;
+        }
+
+        String cedula = txtCedula.getText().trim();
+
+        // Validar que tenga exactamente los 10 dígitos obligatorios antes de procesar
+        if (cedula.length() != 10) {
+            mostrarAlerta(Alert.AlertType.WARNING,
+                    "Cédula incompleta",
+                    "La cédula debe contener exactamente 10 dígitos.");
+            txtCedula.requestFocus();
+            return true;
+        }
+
+        return false;
+    }
+
+    private void mostrarAlerta(Alert.AlertType tipo, String titulo, String mensaje) {
+        Alert alert = new Alert(tipo);
         alert.setTitle(titulo);
         alert.setHeaderText(null);
         alert.setContentText(mensaje);
         alert.showAndWait();
-    }
-    @FXML
-    private void nuevoProfesor() {
-        // Limpia todos los campos de texto
-        limpiar();
-
-        // Opcional: poner el foco en el primer campo para empezar a escribir de una
-        txtNombre.requestFocus();
     }
 }

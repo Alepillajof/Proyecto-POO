@@ -2,6 +2,7 @@ package com.proyecto.proyecto_poo.controller;
 
 import com.proyecto.proyecto_poo.dao.ReporteDAO;
 import com.proyecto.proyecto_poo.model.Reporte;
+import com.proyecto.proyecto_poo.util.Sesion;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -10,243 +11,191 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 
 import java.time.LocalDate;
+import java.util.List;
 
 public class ReporteController {
 
-    @FXML
-    private TextField txtTitulo;
+    // Componentes del Formulario Izquierdo
+    @FXML private TextField txtTitulo;
+    @FXML private TextArea txtDescripcion;
+    @FXML private DatePicker dpFecha;
+    @FXML private ComboBox<String> cmbEstado;
 
-    @FXML
-    private TextArea txtDescripcion;
-
-    @FXML
-    private DatePicker dpFecha;
-
-    @FXML
-    private TextField txtUsuarioId;
-
-    @FXML
-    private TableView<Reporte> tablaReportes;
-
-    @FXML
-    private TableColumn<Reporte, Integer> colId;
-
-    @FXML
-    private TableColumn<Reporte, String> colTitulo;
-
-    @FXML
-    private TableColumn<Reporte, String> colDescripcion;
-
-    @FXML
-    private TableColumn<Reporte, LocalDate> colFecha;
-
-    @FXML
-    private TableColumn<Reporte, Integer> colUsuarioId;
+    // Componentes de la Tabla Derecha
+    @FXML private TableView<AsignacionDTO> tablaAsignaciones;
+    @FXML private TableColumn<AsignacionDTO, Integer> colAsignacionId;
+    @FXML private TableColumn<AsignacionDTO, String> colCarrera;
+    @FXML private TableColumn<AsignacionDTO, String> colNombreEstudiante;
+    @FXML private TableColumn<AsignacionDTO, String> colApellidoEstudiante;
+    @FXML private TableColumn<AsignacionDTO, String> colCorreoEstudiante;
 
     private final ReporteDAO dao = new ReporteDAO();
-
-    private final ObservableList<Reporte> lista =
-            FXCollections.observableArrayList();
+    private final ObservableList<AsignacionDTO> listaAsignaciones = FXCollections.observableArrayList();
+    private AsignacionDTO asignacionSeleccionada;
 
     @FXML
     public void initialize() {
+        // Inicializar el ComboBox de Estados
+        cmbEstado.setItems(FXCollections.observableArrayList("Pendiente", "Aprobado", "En Revisión", "Corregir"));
 
-        colId.setCellValueFactory(new PropertyValueFactory<>("id"));
-        colTitulo.setCellValueFactory(new PropertyValueFactory<>("titulo"));
-        colDescripcion.setCellValueFactory(new PropertyValueFactory<>("descripcion"));
-        colFecha.setCellValueFactory(new PropertyValueFactory<>("fecha"));
-        colUsuarioId.setCellValueFactory(new PropertyValueFactory<>("usuarioId"));
+        // Enlazar de forma estricta las columnas con las propiedades de AsignacionDTO
+        colAsignacionId.setCellValueFactory(new PropertyValueFactory<>("id"));
+        colCarrera.setCellValueFactory(new PropertyValueFactory<>("carrera"));
+        colNombreEstudiante.setCellValueFactory(new PropertyValueFactory<>("nombre"));
+        colApellidoEstudiante.setCellValueFactory(new PropertyValueFactory<>("apellido"));
+        colCorreoEstudiante.setCellValueFactory(new PropertyValueFactory<>("correo"));
 
-        cargarTabla();
+        tablaAsignaciones.setItems(listaAsignaciones);
 
-        tablaReportes.getSelectionModel().selectedItemProperty().addListener(
-                (observable, anterior, reporte) -> {
-
-                    if (reporte != null) {
-
-                        txtTitulo.setText(reporte.getTitulo());
-                        txtDescripcion.setText(reporte.getDescripcion());
-                        dpFecha.setValue(reporte.getFecha());
-                        txtUsuarioId.setText(String.valueOf(reporte.getUsuarioId()));
-
+        // Listener para capturar la fila del estudiante seleccionado
+        tablaAsignaciones.getSelectionModel().selectedItemProperty().addListener(
+                (observable, anterior, seleccionado) -> {
+                    if (seleccionado != null) {
+                        asignacionSeleccionada = seleccionado;
+                        txtTitulo.setText("Reporte - " + seleccionado.getNombre() + " " + seleccionado.getApellido());
                     }
-
                 });
 
+        // Control de vistas por rol
+        String rolActivo = Sesion.getInstancia().getRolActivo();
+        if (rolActivo != null && rolActivo.equalsIgnoreCase("ADMIN")) {
+            txtTitulo.setDisable(true);
+            txtDescripcion.setDisable(true);
+            dpFecha.setDisable(true);
+            cmbEstado.setDisable(true);
+
+            tablaAsignaciones.setVisible(false);
+            tablaAsignaciones.setManaged(false);
+
+            javafx.application.Platform.runLater(() -> {
+                mostrarAlerta(Alert.AlertType.WARNING, "Acceso Denegado", "El rol de Administrador no gestiona reportes.");
+            });
+            return;
+        }
+
+        // Carga automática inicial al abrir la ventana
+        cargarTabla();
+    }
+
+    @FXML
+    private void leer() {
+        if (verificarBloqueoAdmin()) return;
+        cargarTabla();
     }
 
     private void cargarTabla() {
+        listaAsignaciones.clear();
+        // Usamos directamente tu método original de la sesión
+        int idUsuarioLogueado = Sesion.getInstancia().getIdUsuarioLogueado();
 
-        lista.clear();
-        lista.addAll(dao.listar());
-        tablaReportes.setItems(lista);
-
+        List<AsignacionDTO> asignacionesDB = dao.listarEstudiantesAsignados(idUsuarioLogueado);
+        if (asignacionesDB != null) {
+            listaAsignaciones.addAll(asignacionesDB);
+        }
     }
 
     @FXML
     private void guardar() {
-
-        if (!validarCampos()) {
+        if (verificarBloqueoAdmin()) return;
+        if (asignacionSeleccionada == null) {
+            mostrarAlerta(Alert.AlertType.WARNING, "Selección requerida", "Por favor, seleccione un estudiante de la tabla derecha.");
             return;
         }
+        if (validarCampos()) return;
 
-        try {
+        Reporte nuevoReporte = new Reporte();
+        nuevoReporte.setTitulo(txtTitulo.getText().trim());
+        nuevoReporte.setDescripcion(txtDescripcion.getText().trim());
+        nuevoReporte.setFecha(dpFecha.getValue() != null ? dpFecha.getValue() : LocalDate.now());
 
-            Reporte reporte = new Reporte();
+        nuevoReporte.setUsuarioId(asignacionSeleccionada.getEstudianteId());
+        nuevoReporte.setProfesorId(Sesion.getInstancia().getIdUsuarioLogueado());
 
-            reporte.setTitulo(txtTitulo.getText().trim());
-            reporte.setDescripcion(txtDescripcion.getText().trim());
-            reporte.setFecha(dpFecha.getValue());
-            reporte.setUsuarioId(Integer.parseInt(txtUsuarioId.getText().trim()));
-
-            if (dao.guardar(reporte)) {
-
-                mostrarInformacion("Éxito", "Reporte guardado correctamente.");
-                limpiar();
-                cargarTabla();
-
-            }
-
-        } catch (NumberFormatException e) {
-
-            mostrarAlerta("Error", "El ID del usuario debe ser un número.");
-
+        if (dao.guardar(nuevoReporte)) {
+            mostrarAlerta(Alert.AlertType.INFORMATION, "Éxito", "Reporte académico guardado correctamente.");
+            limpiar();
+        } else {
+            mostrarAlerta(Alert.AlertType.ERROR, "Error", "No se pudo registrar el reporte.");
         }
-
     }
 
     @FXML
     private void actualizar() {
-
-        Reporte reporte = tablaReportes.getSelectionModel().getSelectedItem();
-
-        if (reporte == null) {
-
-            mostrarAlerta("Aviso", "Seleccione un reporte para actualizar.");
-            return;
-
-        }
-
-        if (!validarCampos()) {
-            return;
-        }
-
-        try {
-
-            reporte.setTitulo(txtTitulo.getText().trim());
-            reporte.setDescripcion(txtDescripcion.getText().trim());
-            reporte.setFecha(dpFecha.getValue());
-            reporte.setUsuarioId(Integer.parseInt(txtUsuarioId.getText().trim()));
-
-            if (dao.actualizar(reporte)) {
-
-                mostrarInformacion("Éxito", "Reporte actualizado correctamente.");
-                limpiar();
-                cargarTabla();
-
-            }
-
-        } catch (NumberFormatException e) {
-
-            mostrarAlerta("Error", "El ID del usuario debe ser un número.");
-
-        }
-
+        if (verificarBloqueoAdmin()) return;
+        mostrarAlerta(Alert.AlertType.INFORMATION, "Aviso", "La actualización se maneja mediante la selección de nuevas asignaciones.");
     }
 
     @FXML
     private void eliminar() {
-
-        Reporte reporte = tablaReportes.getSelectionModel().getSelectedItem();
-
-        if (reporte == null) {
-
-            mostrarAlerta("Aviso", "Seleccione un reporte para eliminar.");
-            return;
-
-        }
-
-        if (dao.eliminar(reporte.getId())) {
-
-            mostrarInformacion("Éxito", "Reporte eliminado correctamente.");
-            limpiar();
-            cargarTabla();
-
-        }
-
+        if (verificarBloqueoAdmin()) return;
+        mostrarAlerta(Alert.AlertType.INFORMATION, "Aviso", "Los reportes se eliminan desde el historial de reportes global.");
     }
 
-    private boolean validarCampos() {
-
-        if (txtTitulo.getText().trim().isEmpty()) {
-
-            mostrarAlerta("Campo vacío", "Ingrese el título.");
-            txtTitulo.requestFocus();
-            return false;
-
-        }
-
-        if (txtDescripcion.getText().trim().isEmpty()) {
-
-            mostrarAlerta("Campo vacío", "Ingrese la descripción.");
-            txtDescripcion.requestFocus();
-            return false;
-
-        }
-
-        if (dpFecha.getValue() == null) {
-
-            mostrarAlerta("Campo vacío", "Seleccione una fecha.");
-            dpFecha.requestFocus();
-            return false;
-
-        }
-
-        if (txtUsuarioId.getText().trim().isEmpty()) {
-
-            mostrarAlerta("Campo vacío", "Ingrese el ID del usuario.");
-            txtUsuarioId.requestFocus();
-            return false;
-
-        }
-
-        return true;
-
-    }
-
+    @FXML
     private void limpiar() {
-
         txtTitulo.clear();
         txtDescripcion.clear();
         dpFecha.setValue(null);
-        txtUsuarioId.clear();
-
-        tablaReportes.getSelectionModel().clearSelection();
-
+        cmbEstado.setValue(null);
+        asignacionSeleccionada = null;
+        tablaAsignaciones.getSelectionModel().clearSelection();
     }
 
-    private void mostrarAlerta(String titulo, String mensaje) {
+    private boolean verificarBloqueoAdmin() {
+        String rolActivo = Sesion.getInstancia().getRolActivo();
+        if (rolActivo != null && rolActivo.equalsIgnoreCase("ADMIN")) {
+            mostrarAlerta(Alert.AlertType.ERROR, "Acción no permitida", "Los administradores no interactúan con esta sección.");
+            return true;
+        }
+        return false;
+    }
 
-        Alert alert = new Alert(Alert.AlertType.ERROR);
+    private boolean validarCampos() {
+        if (txtTitulo.getText().trim().isEmpty() ||
+                txtDescripcion.getText().trim().isEmpty() ||
+                cmbEstado.getValue() == null) {
 
+            mostrarAlerta(Alert.AlertType.WARNING, "Campos Vacíos", "Por favor, complete el título, la descripción y el estado.");
+            return true;
+        }
+        return false;
+    }
+
+    private void mostrarAlerta(Alert.AlertType tipo, String titulo, String mensaje) {
+        Alert alert = new Alert(tipo);
         alert.setTitle(titulo);
         alert.setHeaderText(null);
         alert.setContentText(mensaje);
-
         alert.showAndWait();
-
     }
 
-    private void mostrarInformacion(String titulo, String mensaje) {
+    // --- Data Transfer Object (DTO) ---
+    public static class AsignacionDTO {
+        private int id;
+        private int estudianteId;
+        private String carrera;
+        private String nombre;
+        private String apellido;
+        private String correo;
 
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        public AsignacionDTO() {}
 
-        alert.setTitle(titulo);
-        alert.setHeaderText(null);
-        alert.setContentText(mensaje);
+        public int getId() { return id; }
+        public void setId(int id) { this.id = id; }
 
-        alert.showAndWait();
+        public int getEstudianteId() { return estudianteId; }
+        public void setEstudianteId(int estudianteId) { this.estudianteId = estudianteId; }
 
+        public String getCarrera() { return carrera; }
+        public void setCarrera(String carrera) { this.carrera = carrera; }
+
+        public String getNombre() { return nombre; }
+        public void setNombre(String nombre) { this.nombre = nombre; }
+
+        public String getApellido() { return apellido; }
+        public void setApellido(String apellido) { this.apellido = apellido; }
+
+        public String getCorreo() { return correo; }
+        public void setCorreo(String correo) { this.correo = correo; }
     }
-
 }
