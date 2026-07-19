@@ -6,12 +6,10 @@
 
 <BorderPane prefHeight="750" prefWidth="1200" style="-fx-background-color: #12142b;" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.proyecto.proyecto_poo.controller.DashboardController">
 
-    <!-- VINCULACIÓN AL ARCHIVO CSS -->
     <stylesheets>
         <URL value="@../css/estilos.css" />
     </stylesheets>
 
-    <!-- BARRA SUPERIOR -->
     <top>
         <HBox alignment="CENTER_LEFT" prefHeight="80" style="-fx-padding: 0 30 0 280;">
             <VBox alignment="CENTER_LEFT">
@@ -30,7 +28,6 @@
         </HBox>
     </top>
 
-    <!-- MENÚ LATERAL -->
     <left>
         <VBox prefWidth="250" spacing="15" style="-fx-background-color: #0b0c1b; -fx-padding: 30 15 20 15; -fx-border-color: #1e2240; -fx-border-width: 0 1 0 0;">
 
@@ -55,7 +52,7 @@
         </VBox>
     </left>
 
-    <!-- ÁREA DE CONTENIDO -->
+
     <center>
         <StackPane fx:id="panelPrincipal" style="-fx-background-color: transparent;" />
     </center>

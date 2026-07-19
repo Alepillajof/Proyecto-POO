@@ -25,9 +25,6 @@ public class Asignacion {
         this.estado = estado;
     }
 
-    // ==========================================
-    //          GETTERS AND SETTERS NATIVOS
-    // ==========================================
 
     public int getId() {
         return id;
@@ -60,10 +57,6 @@ public class Asignacion {
     public void setEstado(String estado) {
         this.estado = estado;
     }
-
-    // ==========================================
-    //    GETTERS AND SETTERS PARA EL TABLEVIEW
-    // ==========================================
 
     public String getNombreEstudiante() {
         return nombreEstudiante;

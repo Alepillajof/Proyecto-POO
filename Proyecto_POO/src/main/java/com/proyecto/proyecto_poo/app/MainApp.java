@@ -14,19 +14,15 @@ public class MainApp extends Application {
                 MainApp.class.getResource("/view/login.fxml")
         );
 
-        // Cargamos la escena normal
         Scene scene = new Scene(loader.load());
 
         stage.setTitle("Sistema de Gestión Educativa");
         stage.setScene(scene);
 
-        // ¡AQUÍ ESTÁ EL CAMBIO!
-        // Permitimos que la ventana se pueda redimensionar
         stage.setResizable(true);
 
         stage.show();
     }
-
 
     public static void main(String[] args) {
         launch(args);

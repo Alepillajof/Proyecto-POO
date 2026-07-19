@@ -6,13 +6,11 @@ import java.sql.SQLException;
 
 public class Conexion {
 
-    // Datos exactos extraídos de tus enlaces de conexión
     private static final String HOST = "tokaido.proxy.rlwy.net";
     private static final String PORT = "34155";
     private static final String DATABASE = "railway";
     private static final String USER = "root";
 
-    // Contraseña corregida con la 'p' minúscula exacta de tu link
     private static final String PASSWORD = "EaTFGpGUoobdcxdiVBqDOnGUWAPgAXkG";
 
     private static final String URL =
@@ -32,10 +30,10 @@ public class Conexion {
             return con;
 
         } catch (ClassNotFoundException e) {
-            System.err.println("❌ ERROR: No se encontró el driver de MySQL en el proyecto.");
+            System.err.println("ERROR: No se encontró el driver de MySQL en el proyecto.");
             return null;
         } catch (SQLException e) {
-            System.err.println("❌ ERROR DE CONEXIÓN: " + e.getMessage());
+            System.err.println("ERROR DE CONEXIÓN: " + e.getMessage());
             return null;
         }
     }

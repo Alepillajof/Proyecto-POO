@@ -9,10 +9,6 @@ import java.util.List;
 
 public class ProfesorDAO {
 
-    /**
-     * Guarda el profesor usando su propio ID autoincremental en la tabla profesores
-     * e inserta sus credenciales en la tabla usuarios de forma independiente.
-     */
     public boolean guardar(Profesor profesor) {
         // --- Generación Automática de Credenciales ---
         String nombreLimpio = profesor.getNombre().trim().toLowerCase().split(" ")[0];
@@ -70,7 +66,7 @@ public class ProfesorDAO {
             }
 
         } catch (SQLException e) {
-            System.err.println("❌ Error al guardar profesor en las tablas: " + e.getMessage());
+            System.err.println("Error al guardar profesor en las tablas: " + e.getMessage());
             if (con != null) {
                 try { con.rollback(); } catch (SQLException ex) { ex.printStackTrace(); }
             }
@@ -86,9 +82,6 @@ public class ProfesorDAO {
         return false;
     }
 
-    /**
-     * Lista los profesores directamente desde su propia tabla en Railway.
-     */
     public List<Profesor> listar() {
         List<Profesor> lista = new ArrayList<>();
         String sql = "SELECT id, nombre, apellido, cedula, especialidad, correo FROM profesores";
@@ -110,14 +103,11 @@ public class ProfesorDAO {
             }
 
         } catch (SQLException e) {
-            System.err.println("❌ Error al listar profesores: " + e.getMessage());
+            System.err.println("Error al listar profesores: " + e.getMessage());
         }
         return lista;
     }
 
-    /**
-     * Actualiza los datos basándose en el ID de la tabla profesores y busca el usuario por su correo.
-     */
     public boolean actualizar(Profesor profesor) {
         String sqlProfesor = "UPDATE profesores SET nombre = ?, apellido = ?, cedula = ?, especialidad = ? WHERE id = ?";
         String sqlUsuario = "UPDATE usuarios SET nombre = ?, apellido = ? WHERE correo = ?";
@@ -149,7 +139,7 @@ public class ProfesorDAO {
             con.commit();
             return true;
         } catch (SQLException e) {
-            System.err.println("❌ Error al actualizar profesor: " + e.getMessage());
+            System.err.println("Error al actualizar profesor: " + e.getMessage());
             if (con != null) {
                 try { con.rollback(); } catch (SQLException ex) { ex.printStackTrace(); }
             }
@@ -159,9 +149,6 @@ public class ProfesorDAO {
         }
     }
 
-    /**
-     * Elimina el registro de profesores y su respectivo acceso en usuarios usando el correo.
-     */
     public boolean eliminar(Profesor profesor) {
         String sqlProfesor = "DELETE FROM profesores WHERE id = ?";
         String sqlUsuario = "DELETE FROM usuarios WHERE correo = ?";

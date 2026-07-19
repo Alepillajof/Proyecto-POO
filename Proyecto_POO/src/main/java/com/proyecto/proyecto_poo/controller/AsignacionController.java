@@ -65,7 +65,7 @@ public class AsignacionController {
             listaObservable = FXCollections.observableArrayList(listaDB);
             tablaAsignaciones.setItems(listaObservable);
         } catch (Exception e) {
-            System.err.println("❌ Error al listar asignaciones desde el DAO:");
+            System.err.println("Error al listar asignaciones desde el DAO:");
             e.printStackTrace();
         }
     }

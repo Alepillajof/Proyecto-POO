@@ -9,11 +9,6 @@ import java.util.List;
 
 public class AsignacionDAO {
 
-    /**
-     * Verifica si un estudiante ya cuenta con un profesor asignado cuyo estado
-     * no sea 'COMPLETADO' ni 'FINALIZADO'.
-     * @return true si el estudiante está ocupado con otra asignación activa.
-     */
     public boolean tieneAsignacionActiva(int estudianteId, int asignacionIdActual) {
         // Buscamos si hay registros para este estudiante que sigan PENDIENTES o activos
         String sql = "SELECT COUNT(*) FROM asignaciones " +
@@ -33,14 +28,11 @@ public class AsignacionDAO {
                 }
             }
         } catch (SQLException e) {
-            System.err.println("❌ Error al verificar asignación activa: " + e.getMessage());
+            System.err.println("Error al verificar asignación activa: " + e.getMessage());
         }
         return false;
     }
 
-    /**
-     * Guarda la asignación verificando primero la regla de negocio.
-     */
     public boolean guardar(Asignacion asignacion) {
         // REGLA DE NEGOCIO: Validar si el alumno ya está comprometido con otro tutor
         if (tieneAsignacionActiva(asignacion.getEstudianteId(), 0)) {
@@ -67,14 +59,11 @@ public class AsignacionDAO {
                 return true;
             }
         } catch (SQLException e) {
-            System.err.println("❌ Error al guardar asignación: " + e.getMessage());
+            System.err.println("Error al guardar asignación: " + e.getMessage());
         }
         return false;
     }
 
-    /**
-     * Actualiza una asignación existente validando que no colisione con la regla.
-     */
     public boolean actualizar(Asignacion asignacion) {
         // REGLA DE NEGOCIO: Validar que al cambiar de estudiante o reabrir el estado, no duplique tutores activos
         if (tieneAsignacionActiva(asignacion.getEstudianteId(), asignacion.getId())) {
@@ -94,14 +83,11 @@ public class AsignacionDAO {
 
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
-            System.err.println("❌ Error al actualizar asignación: " + e.getMessage());
+            System.err.println("Error al actualizar asignación: " + e.getMessage());
             return false;
         }
     }
 
-    /**
-     * Lista todas las asignaciones cruzando los datos para la interfaz.
-     */
     public List<Asignacion> listar() {
         List<Asignacion> lista = new ArrayList<>();
         // Ajusta las columnas 'e.nombre', 'e.apellido', 'e.cedula', 'e.carrera' según tu esquema real
@@ -129,14 +115,11 @@ public class AsignacionDAO {
                 lista.add(a);
             }
         } catch (SQLException e) {
-            System.err.println("❌ Error al listar asignaciones: " + e.getMessage());
+            System.err.println("Error al listar asignaciones: " + e.getMessage());
         }
         return lista;
     }
 
-    /**
-     * Elimina una asignación por ID.
-     */
     public boolean eliminar(int id) {
         String sql = "DELETE FROM asignaciones WHERE id = ?";
         try (Connection con = Conexion.getConexion();
@@ -144,7 +127,7 @@ public class AsignacionDAO {
             ps.setInt(1, id);
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
-            System.err.println("❌ Error al eliminar asignación: " + e.getMessage());
+            System.err.println("Error al eliminar asignación: " + e.getMessage());
             return false;
         }
     }

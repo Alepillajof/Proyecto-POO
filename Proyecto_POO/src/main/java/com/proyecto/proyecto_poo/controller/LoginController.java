@@ -48,7 +48,6 @@ public class LoginController {
             stage.setTitle("Dashboard");
             stage.show();
         } catch(Exception e) {
-            // Esto imprimirá el error real en la consola de IntelliJ
             System.err.println("Error al cargar el dashboard:");
             e.printStackTrace();
         }

@@ -138,9 +138,6 @@ public class DashboardController {
         activarBoton(btnProfesores);
     }
 
-    /**
-     * Corresponde a "Vista Estudiante" (Acceso exclusivo para el ESTUDIANTE)
-     */
     @FXML
     private void abrirEstudiantes() {
         Usuario actual = Sesion.getUsuario();
@@ -152,9 +149,6 @@ public class DashboardController {
         activarBoton(btnEstudiantes);
     }
 
-    /**
-     * Corresponde al botón "Estudiantes" (Gestión global CRUD de alumnos)
-     */
     @FXML
     private void abrirMiPanelEstudiante() {
         Usuario actual = Sesion.getUsuario();

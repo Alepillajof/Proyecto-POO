@@ -44,7 +44,6 @@ public class AdminEstudianteController {
         colCorreo.setCellValueFactory(new PropertyValueFactory<>("correo"));
 
         // --- RESTRICCIÓN EN TIEMPO REAL PARA EL TEXTFIELD DE CÉDULA ---
-        // Elimina letras al instante e impide físicamente ingresar más de 10 números
         txtCedula.textProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue == null) return;
 

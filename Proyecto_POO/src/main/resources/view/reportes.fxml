@@ -11,16 +11,13 @@
             style="-fx-background-color: transparent;">
 
     <children>
-        <!-- TÍTULO Y SUBTÍTULO -->
         <VBox AnchorPane.topAnchor="10" AnchorPane.leftAnchor="40">
             <Label text="Gestión de Reportes" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: white;"/>
             <Label text="Genera reportes académicos basados en tus asignaciones actuales." style="-fx-font-size: 13px; -fx-text-fill: #8b95a5; -fx-padding: 5 0 0 0;"/>
         </VBox>
 
-        <!-- CONTENEDOR PRINCIPAL -->
         <HBox spacing="20" AnchorPane.topAnchor="90" AnchorPane.leftAnchor="40" AnchorPane.rightAnchor="40" AnchorPane.bottomAnchor="30">
 
-            <!-- TARJETA IZQUIERDA: FORMULARIO DEL REPORTE -->
             <VBox spacing="15" prefWidth="350"
                   style="-fx-background-color: #1a1c35; -fx-background-radius: 12; -fx-border-color: #2a2e4d; -fx-border-radius: 12; -fx-border-width: 1;">
 
@@ -47,7 +44,6 @@
                     <DatePicker fx:id="dpFecha" prefWidth="300" prefHeight="40" style="-fx-background-color: #12142b;"/>
                 </VBox>
 
-                <!-- Estado -->
                 <VBox spacing="5">
                     <Label text="Estado del Reporte" style="-fx-text-fill: #c0c6d9; -fx-font-size: 12px;"/>
                     <ComboBox fx:id="cmbEstado" promptText="Seleccione un estado" prefWidth="300" prefHeight="40"
@@ -63,14 +59,12 @@
                     <Button text="Eliminar" onAction="#eliminar" prefWidth="95" prefHeight="38" style="-fx-background-color: #ef4444; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 6; -fx-cursor: hand;"/>
                 </HBox>
 
-                <!-- Nuevas Funciones Añadidas -->
                 <HBox spacing="10" alignment="CENTER" style="-fx-padding: 5 0 0 0;">
                     <Button text="🔊 Leer" onAction="#leer" prefWidth="147" prefHeight="38" style="-fx-background-color: #d97706; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 6; -fx-cursor: hand;"/>
                     <Button text="🗑 Limpiar" onAction="#limpiar" prefWidth="147" prefHeight="38" style="-fx-background-color: #475569; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 6; -fx-cursor: hand;"/>
                 </HBox>
             </VBox>
 
-            <!-- TARJETA DERECHA: TABLA DE ASIGNACIONES Y ESTUDIANTES -->
             <VBox spacing="15" HBox.hgrow="ALWAYS"
                   style="-fx-background-color: #1a1c35; -fx-background-radius: 12; -fx-border-color: #2a2e4d; -fx-border-radius: 12; -fx-border-width: 1;">
 

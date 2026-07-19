@@ -1,10 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!--
-    Vista modificada para la gestión global (CRUD) de Estudiantes.
-    Se vinculó correctamente al controlador AdminEstudianteController.
--->
-
 <?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
@@ -14,16 +9,13 @@
 <AnchorPane prefHeight="650" prefWidth="950" style="-fx-background-color: transparent;" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.proyecto.proyecto_poo.controller.AdminEstudianteController">
 
     <children>
-        <!-- TÍTULO Y SUBTÍTULO -->
         <VBox AnchorPane.leftAnchor="40" AnchorPane.topAnchor="10">
             <Label style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: white;" text="Control de Estudiantes Registrados" />
             <Label style="-fx-font-size: 13px; -fx-text-fill: #8b95a5; -fx-padding: 5 0 0 0;" text="Administra los registros, actualizaciones y reportes de alumnos del sistema." />
         </VBox>
 
-        <!-- CONTENEDOR PRINCIPAL -->
         <HBox spacing="20" AnchorPane.bottomAnchor="30" AnchorPane.leftAnchor="40" AnchorPane.rightAnchor="40" AnchorPane.topAnchor="90">
 
-            <!-- TARJETA IZQUIERDA: FORMULARIO CRUD -->
             <VBox prefWidth="380" spacing="12" style="-fx-background-color: #1a1c35; -fx-background-radius: 12; -fx-border-color: #2a2e4d; -fx-border-radius: 12; -fx-border-width: 1;">
 
                 <padding>
@@ -32,11 +24,9 @@
 
                 <Label style="-fx-font-size: 15px; -fx-font-weight: bold; -fx-text-fill: white; -fx-padding: 0 0 5 0;" text="Formulario del Estudiante" />
 
-                <!-- Desplazable para asegurar la vista limpia en monitores pequeños -->
                 <ScrollPane fitToWidth="true" hbarPolicy="NEVER" style="-fx-background: transparent; -fx-background-color: transparent;" vbarPolicy="AS_NEEDED" VBox.vgrow="ALWAYS">
                     <content>
                         <VBox spacing="10">
-                            <!-- Campo ID (Identificador de Base de Datos - Solo Lectura) -->
                             <VBox spacing="5">
                                 <Label style="-fx-text-fill: #c0c6d9; -fx-font-size: 12px;" text="ID Estudiante (Autogenerado)" />
                                 <TextField fx:id="txtId" editable="false" prefHeight="35" style="-fx-background-color: #12142b; -fx-border-color: #2a2e4d; -fx-border-radius: 6; -fx-background-radius: 6; -fx-text-fill: #8b95a5; -fx-font-weight: bold;" />
@@ -72,26 +62,21 @@
 
                 <Separator style="-fx-background-color: #2a2e4d; -fx-opacity: 0.3;" />
 
-                <!-- SECCIÓN DE ACCIONES (BOTONES) -->
                 <VBox spacing="8">
-                    <!-- Fila 1: Leer (Cargar Base de Datos) y Limpiar Formulario -->
                     <HBox spacing="10">
                         <Button maxWidth="Infinity" onAction="#leer" prefHeight="38" style="-fx-background-color: #d97706; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 6; -fx-cursor: hand;" text="🔍 Leer" HBox.hgrow="ALWAYS" />
                         <Button maxWidth="Infinity" onAction="#limpiar" prefHeight="38" style="-fx-background-color: #4b5563; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 6; -fx-cursor: hand;" text="🧹 Limpiar" HBox.hgrow="ALWAYS" />
                     </HBox>
 
-                    <!-- Fila 2: Guardar Nuevo Registro y Actualizar Existente -->
                     <HBox spacing="10">
                         <Button maxWidth="Infinity" onAction="#guardar" prefHeight="38" style="-fx-background-color: #10b981; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 6; -fx-cursor: hand;" text="💾 Guardar" HBox.hgrow="ALWAYS" />
                         <Button maxWidth="Infinity" onAction="#actualizar" prefHeight="38" style="-fx-background-color: #3b82f6; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 6; -fx-cursor: hand;" text="🔄 Actualizar" HBox.hgrow="ALWAYS" />
                     </HBox>
 
-                    <!-- Fila 3: Eliminar Registro -->
                     <Button maxWidth="Infinity" onAction="#eliminar" prefHeight="38" style="-fx-background-color: #ef4444; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 6; -fx-cursor: hand;" text="🗑️ Eliminar " />
                 </VBox>
             </VBox>
 
-            <!-- TARJETA DERECHA: TABLA DE ESTUDIANTES REGISTRADOS -->
             <VBox spacing="15" style="-fx-background-color: #1a1c35; -fx-background-radius: 12; -fx-border-color: #2a2e4d; -fx-border-radius: 12; -fx-border-width: 1;" HBox.hgrow="ALWAYS">
 
                 <padding>

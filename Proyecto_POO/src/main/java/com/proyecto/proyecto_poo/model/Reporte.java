@@ -29,10 +29,6 @@ public class Reporte {
         this.profesorId = profesorId;
     }
 
-    // ==========================================
-    //          GETTERS AND SETTERS NATIVOS
-    // ==========================================
-
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
 
@@ -50,10 +46,6 @@ public class Reporte {
 
     public int getProfesorId() { return profesorId; }
     public void setProfesorId(int profesorId) { this.profesorId = profesorId; }
-
-    // ==========================================
-    //      GETTERS AND SETTERS AUXILIARES
-    // ==========================================
 
     public String getNombreProfesor() {
         return nombreProfesor;

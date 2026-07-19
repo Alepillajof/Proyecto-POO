@@ -73,8 +73,6 @@ public class ReporteController {
             return;
         }
 
-        // Carga automática inicial al abrir la ventana
-        cargarTabla();
     }
 
     @FXML
@@ -169,7 +167,6 @@ public class ReporteController {
         alert.showAndWait();
     }
 
-    // --- Data Transfer Object (DTO) ---
     public static class AsignacionDTO {
         private int id;
         private int estudianteId;

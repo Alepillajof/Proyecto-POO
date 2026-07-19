@@ -7,16 +7,13 @@
 <AnchorPane prefHeight="650" prefWidth="950" style="-fx-background-color: transparent;" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.proyecto.proyecto_poo.controller.ProfesorController">
 
     <children>
-        <!-- TÍTULO Y SUBTÍTULO -->
         <VBox AnchorPane.leftAnchor="40" AnchorPane.topAnchor="10">
             <Label style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: white;" text="Gestión de Profesores" />
             <Label style="-fx-font-size: 13px; -fx-text-fill: #8b95a5; -fx-padding: 5 0 0 0;" text="Administra, registra y actualiza la información de los docentes del sistema." />
         </VBox>
 
-        <!-- CONTENEDOR PRINCIPAL PARA LAS DOS TARJETAS -->
         <HBox spacing="20" AnchorPane.bottomAnchor="30" AnchorPane.leftAnchor="40" AnchorPane.rightAnchor="40" AnchorPane.topAnchor="90">
 
-            <!-- TARJETA IZQUIERDA: FORMULARIO -->
             <VBox prefWidth="350" spacing="14" style="-fx-background-color: #1a1c35; -fx-background-radius: 12; -fx-border-color: #2a2e4d; -fx-border-radius: 12; -fx-border-width: 1;">
 
                 <padding>
@@ -25,7 +22,6 @@
 
                 <Label style="-fx-font-size: 15px; -fx-font-weight: bold; -fx-text-fill: white; -fx-padding: 0 0 2 0;" text="Información del Profesor" />
 
-                <!-- Campos de entrada -->
                 <VBox spacing="6">
                     <Label style="-fx-text-fill: #c0c6d9; -fx-font-size: 12px; -fx-font-weight: bold;" text="Nombre" />
                     <TextField fx:id="txtNombre" prefHeight="38" promptText="Ingrese el nombre" style="-fx-background-color: #12142b; -fx-border-color: #2a2e4d; -fx-border-radius: 6; -fx-background-radius: 6; -fx-text-fill: white; -fx-prompt-text-fill: #64748b;" />
@@ -48,21 +44,18 @@
 
                 <Region VBox.vgrow="ALWAYS" />
 
-                <!-- FILA 1 DE BOTONES: ACCIONES DE ESCRITURA -->
                 <HBox alignment="CENTER" spacing="8">
                     <Button onAction="#guardar" prefHeight="38" prefWidth="95" style="-fx-background-color: #10b981; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 6; -fx-cursor: hand;" text="Guardar" />
                     <Button onAction="#actualizar" prefHeight="38" prefWidth="95" style="-fx-background-color: #3b82f6; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 6; -fx-cursor: hand;" text="Actualizar" />
                     <Button onAction="#eliminar" prefHeight="38" prefWidth="95" style="-fx-background-color: #ef4444; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 6; -fx-cursor: hand;" text="Eliminar" />
                 </HBox>
 
-                <!-- FILA 2 DE BOTONES: LEER Y LIMPIAR (Diseño estilizado de control) -->
                 <HBox alignment="CENTER" spacing="10" style="-fx-padding: 2 0 0 0;">
                     <Button onAction="#leer" prefHeight="38" prefWidth="146" style="-fx-background-color: #d97706; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 6; -fx-cursor: hand;" text="🔍 Leer Datos" />
                     <Button onAction="#limpiarFormulario" prefHeight="38" prefWidth="146" style="-fx-background-color: #475569; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 6; -fx-cursor: hand;" text="🗑 Limpiar" />
                 </HBox>
             </VBox>
 
-            <!-- TARJETA DERECHA: TABLA -->
             <VBox spacing="15" style="-fx-background-color: #1a1c35; -fx-background-radius: 12; -fx-border-color: #2a2e4d; -fx-border-radius: 12; -fx-border-width: 1;" HBox.hgrow="ALWAYS">
 
                 <padding>

@@ -9,11 +9,6 @@ import java.util.List;
 
 public class AdminEstudianteDAO {
 
-    /**
-     * REGISTRO EN DOS TABLAS (Transacción Completa):
-     * Inserta los datos coordinadamente en 'usuarios' y 'estudiantes'.
-     * Genera el correo automatico 'nombre.apellido@epn.edu.ec' y lo asigna también como 'usuario'.
-     */
     public boolean guardar(Estudiante estudiante) {
         // --- Generación Automática de Credenciales ---
         String nombreLimpio = estudiante.getNombre().trim().toLowerCase().split(" ")[0];
@@ -93,7 +88,7 @@ public class AdminEstudianteDAO {
             }
 
         } catch (SQLException e) {
-            System.err.println("❌ Error crítico en la transacción de guardado: " + e.getMessage());
+            System.err.println("Error crítico en la transacción de guardado: " + e.getMessage());
             if (con != null) {
                 try {
                     con.rollback();
@@ -114,10 +109,6 @@ public class AdminEstudianteDAO {
         return false;
     }
 
-    /**
-     * LECTURA DE DATOS (INNER JOIN):
-     * Resuelve el conflicto de lectura uniendo 'usuarios' y 'estudiantes' mediante un alias directo.
-     */
     public List<Estudiante> listar() {
         List<Estudiante> lista = new ArrayList<>();
 
@@ -150,15 +141,11 @@ public class AdminEstudianteDAO {
                 lista.add(est);
             }
         } catch (SQLException e) {
-            System.err.println("❌ Error crítico al leer la base de datos distribuida: " + e.getMessage());
+            System.err.println("Error crítico al leer la base de datos distribuida: " + e.getMessage());
         }
         return lista;
     }
 
-    /**
-     * ACTUALIZACIÓN EN CASCADA:
-     * Modifica los datos correspondientes en ambas tablas al mismo tiempo.
-     */
     public boolean actualizar(Estudiante estudiante) {
         String sqlUsuario = "UPDATE usuarios SET nombre = ?, apellido = ? WHERE id = ?";
         String sqlEstudiante = "UPDATE estudiantes SET nombre = ?, apellido = ?, cedula = ?, carrera = ?, nivel = ? WHERE id = ?";
@@ -191,7 +178,7 @@ public class AdminEstudianteDAO {
             con.commit();
             return true;
         } catch (SQLException e) {
-            System.err.println("❌ Error crítico al actualizar el registro: " + e.getMessage());
+            System.err.println("Error crítico al actualizar el registro: " + e.getMessage());
             if (con != null) {
                 try { con.rollback(); } catch (SQLException ex) { ex.printStackTrace(); }
             }
@@ -201,10 +188,6 @@ public class AdminEstudianteDAO {
         }
     }
 
-    /**
-     * ELIMINACIÓN EN CASCADA:
-     * Remueve los registros cuidando las restricciones de clave foránea.
-     */
     public boolean eliminar(int id) {
         // Primero borramos de la tabla hija (estudiantes) para evitar violaciones de llaves foráneas
         String sqlEstudiante = "DELETE FROM estudiantes WHERE id = ?";
@@ -229,7 +212,7 @@ public class AdminEstudianteDAO {
             con.commit();
             return true;
         } catch (SQLException e) {
-            System.err.println("❌ Error crítico al eliminar el registro: " + e.getMessage());
+            System.err.println("Error crítico al eliminar el registro: " + e.getMessage());
             if (con != null) {
                 try { con.rollback(); } catch (SQLException ex) { ex.printStackTrace(); }
             }

@@ -44,7 +44,6 @@ public class ProfesorController {
         colCedula.setCellValueFactory(new PropertyValueFactory<>("cedula"));
         colEspecialidad.setCellValueFactory(new PropertyValueFactory<>("especialidad"));
 
-        // --- RESTRICCIÓN EN TIEMPO REAL PARA EL TEXTFIELD DE CÉDULA ---
         // Escucha los cambios de texto e impide escribir más de 10 caracteres o letras
         txtCedula.textProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue == null) return;

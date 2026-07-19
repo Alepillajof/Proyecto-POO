@@ -70,9 +70,6 @@ public class ReporteDAO implements ICRUD<Reporte> {
     @Override
     public List<Reporte> listar() {
         List<Reporte> lista = new ArrayList<>();
-        // Relación cruzada: un reporte le pertenece a un estudiante (usuario_id).
-        // Mediante la tabla 'asignaciones', encontramos qué profesor está a cargo de ese estudiante
-        // para así poder pintar el nombre del Profesor y su Especialidad en la tabla superior.
         String sql = """
                 SELECT r.*, p.nombre AS prof_nombre, p.apellido AS prof_apellido, p.especialidad\s
                 FROM reportes r

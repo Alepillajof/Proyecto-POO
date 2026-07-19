@@ -7,14 +7,12 @@
 <AnchorPane prefHeight="650" prefWidth="900" style="-fx-background-color: #0b0c1b;" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.proyecto.proyecto_poo.controller.LoginController"> <!-- Fondo profundo -->
 
     <children>
-        <!-- Tarjeta de Login Glassmorphic -->
         <VBox alignment="CENTER" prefHeight="550" prefWidth="450" style="-fx-background-color: rgba(255, 255, 255, 0.05); -fx-background-radius: 20; -fx-border-color: rgba(255, 255, 255, 0.1); -fx-border-radius: 20; -fx-border-width: 1;" AnchorPane.leftAnchor="225" AnchorPane.topAnchor="50">
 
             <padding>
                 <Insets bottom="40" left="40" right="40" top="40" />
             </padding>
 
-            <!-- Icono superior (Logo) -->
             <StackPane prefHeight="80" prefWidth="80" style="-fx-background-color: rgba(124, 58, 237, 0.2); -fx-background-radius: 40;">
                 <Label style="-fx-font-size: 30px;" text="🎓" />
                 <VBox.margin> <Insets bottom="20" /> </VBox.margin>
@@ -23,14 +21,12 @@
             <Label style="-fx-text-fill: white; -fx-font-size: 24px; -fx-font-weight: bold;" text="SISTEMA EDUCATIVO" />
             <Label style="-fx-text-fill: #94a3b8; -fx-font-size: 14px; -fx-padding: 0 0 30 0;" text="Inicia sesión para continuar" />
 
-            <!-- Campos -->
             <TextField fx:id="txtUsuario" prefHeight="50" promptText="Usuario" style="-fx-background-color: rgba(18, 20, 43, 0.6); -fx-border-color: #312e81; -fx-border-radius: 8; -fx-text-fill: white; -fx-prompt-text-fill: #64748b; -fx-padding: 0 15;" />
 
             <PasswordField fx:id="txtContrasena" prefHeight="50" promptText="Contraseña" style="-fx-background-color: rgba(18, 20, 43, 0.6); -fx-border-color: #312e81; -fx-border-radius: 8; -fx-text-fill: white; -fx-prompt-text-fill: #64748b; -fx-padding: 0 15;">
                 <VBox.margin> <Insets bottom="25" top="15" /> </VBox.margin>
             </PasswordField>
 
-            <!-- Botón Ingresar -->
             <Button fx:id="btnIngresar" onAction="#iniciarSesion" prefHeight="50" prefWidth="400" style="-fx-background-color: linear-gradient(to right, #7c3aed, #4f46e5); -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8; -fx-cursor: hand;" text="INGRESAR" />
         </VBox>
     </children>
