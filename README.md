@@ -23,19 +23,27 @@ La aplicación destaca por su arquitectura robusta, modular y segura, implementa
 
 ##  Estructura del Proyecto
 
-Proyecto_POO/  .
-├── src/main/java/com/proyecto-poo/  .
-│   ├── app/        # Clase principal (MainApp)  .
-│   ├── controller/ # Controladores de interfaz (FXML)  .
-│   ├── dao/        # Capa de acceso a datos (ICRUD)  .
-│   ├── db/         # Conexión a base de datos  .
-│   ├── model/      # Entidades del sistema  .
-│   └── util/       # Clases auxiliares (Sesión)  .
-├── resources/  .
-│   ├── view/       # Archivos FXML  .
-│   ├── css/        # Estilos visuales  .
-│   └── database/   # script_bd_proyecto_poo.sql  .
-└── docs/           # Manual de usuario e informe técnico  .
+## Estructura del proyecto
+
+```text
+Proyecto_POO/
+├── src/
+│   └── main/
+│       └── java/
+│           └── com/
+│               └── proyecto_poo/
+│                   ├── app/         # Clase principal (MainApp)
+│                   ├── controller/  # Controladores de interfaz (FXML)
+│                   ├── dao/         # Capa de acceso a datos (ICRUD)
+│                   ├── db/          # Conexión a base de datos
+│                   ├── model/       # Entidades del sistema
+│                   └── util/        # Clases auxiliares (Sesión)
+├── resources/
+│   ├── view/        # Archivos FXML
+│   ├── css/         # Estilos visuales
+│   └── database/    # script_bd_proyecto_poo.sql
+└── docs/            # Manual de usuario e informe técnico
+```
 
 # 📄 Documentación
 Dentro del proyecto se incluyen:
